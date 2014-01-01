@@ -26,12 +26,12 @@ process_rcfile() {
     elif [[ $o =~ ^-      ]]                     # Compiler flags
     then flags+=($o)
     elif [[ $o =~ ^pkg-config[[:space:]]+--cflags ]]
-    then flags+=($($o))
+    then flags+=($($o)) || fatal $LINENO "$1:$i error: pkg-config failure\n\t$o"
     elif [[ $o =~ ^pkg-config[[:space:]]+--libs ]]
-    then logic+=($($o))
+    then logic+=($($o)) || fatal $LINENO "$1:$i error: pkg-config failure\n\t$o"
     elif [ -f "$o" ]                             # Linker target
     then logic+=($o)
-    else fatal $LINENO "$1:$i:1 error: invalid c99sh option\n\t$o\n\t^"
+    else fatal $LINENO "$1:$i error: non-existent file or unknown option\n\t$o"
     fi
   done < <(sed -e 's/^[[:space:]]*//;s/[[:space:]]*$//' "$1")
 }
