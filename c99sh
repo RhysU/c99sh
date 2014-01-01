@@ -3,27 +3,26 @@ set -eu
 [ $# -lt 1  ] && echo "Use $0 only as an interpreter" 1>&2 && exit $LINENO
 [ ! -f "$1" ] && echo "File '$1' does not exist"      1>&2 && exit $LINENO
 
-# Automatic cleanup of temporary files
-dirn=$(dirname "$1")
-cout=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX.c") # Mangled source
-xout=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX.x") # Compiled binary
-trap 'rm -f "$cout" "$xout"' EXIT
+d=$(dirname "$1")                           # Directory of source
+c=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX.c") # Mangled source
+x=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX.x") # Compiled binary
+trap 'rm -f "$c" "$x"' EXIT                 # Automatic cleanup
 
 # Process an rcfile given its filename
-declare -a flags=(${CFLAGS-} "-I$dirn")
-declare -a sources=("$cout" ${LDFLAGS-})
+declare -a flags=(${CFLAGS-} "-I$d")
+declare -a logic=("$c" ${LDFLAGS-})
 process_rcfile() {
   local i=0
   while read -r line; do
-    echo "#line $((i+=1)) \"$1\" // $line" >> "$cout"
+    echo "#line $((i+=1)) \"$1\" // $line" >> "$c"
     if   [ -z "$line" ]
     then :
     elif [[ $line =~ ^[[:space:]]*# ]]
-    then echo "$line" >> "$cout"
+    then echo "$line" >> "$c"
     elif [[ $line =~ ^[[:space:]]*-[lLR] ]]
-    then sources+=("$line")
+    then logic+=("$line")
     elif [[ $line =~ ^[[:space:]]*pkg-config[[:space:]]+--libs ]]
-    then sources+=($(eval "$line")) # FIXME Glaring security bug
+    then logic+=($(eval "$line")) # FIXME Glaring security bug
     elif [[ $line =~ ^[[:space:]]*pkg-config[[:space:]]+--cflags ]]
     then flags+=($(eval "$line")) # FIXME Glaring security concern
     else flags+=($line)
@@ -32,8 +31,8 @@ process_rcfile() {
 }
 
 # Incorporate the first rcfile found
-if   [ -f "$dirn/c99shrc" ]
-then process_rcfile "$dirn/c99shrc"
+if   [ -f "$d/c99shrc" ]
+then process_rcfile "$d/c99shrc"
 elif [ -f "$HOME/.c99shrc" ]
 then process_rcfile "$HOME/.c99shrc"
 fi
@@ -42,11 +41,11 @@ fi
 # Possibly swap shebang on first line of each with a line pragma so
 #   (a) the source can be compiled, and
 #   (b) errors and warnings show usable line details
-echo "#line 1 \"$1\""                 >> "$cout"
-sed "1s|^#!.*\$|#line 2 \"$1\"|" "$1" >> "$cout"
+echo "#line 1 \"$1\""                 >> "$c"
+sed "1s|^#!.*\$|#line 2 \"$1\"|" "$1" >> "$c"
 
 # Compile and execute with any remaining command line arguments
-c99 -o "$xout" "${flags[@]}" "${sources[@]}" 1>&2
+# TODO Can exec "$x" be used and the cleanup trap still work?
+c99 -o "$x" "${flags[@]}" "${logic[@]}" 1>&2
 shift
-# TODO Can exec be used and the cleanup trap still executed?
-"$xout" "$@"
+"$x" "$@"
