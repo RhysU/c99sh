@@ -1,4 +1,7 @@
 #!/bin/bash
+# c99sh: A shebang-friendly script for "interpreting" single C99 files
+# from https://github.com/rhysu/c99sh.  Subject to the Simplified BSD License.
+
 set -eu
 fatal() { status=$1; shift; printf "$@" 1>&2; echo 1>&2; exit $status; }
 [ $# -lt 1  ] && fatal $LINENO "Use %s only as an interpreter" "$0"
@@ -14,8 +17,7 @@ declare -a flags=(${CFLAGS-} "-I$d")      # CPPFLAGS, CFLAGS
 declare -a logic=("$c" ${LDFLAGS-})       # Sources, LDFLAGS, LIBS
 process_rcfile() {
   local i=0
-  while read -r o
-  do
+  while read -r o; do
     echo "#line $((i+=1)) \"$1\" // $o" >> "$c"  # Record line in munged source
     if   [  -z "$o"        ]                     # Skip empty lines
     then :
