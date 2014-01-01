@@ -25,10 +25,10 @@ process_rcfile() {
     then logic+=($o)
     elif [[ $o =~ ^-      ]]                     # Compiler flags
     then flags+=($o)
-    elif [[ $o =~ ^pkg-config[[:space:]]+--cflags ]]
+    elif [[ $o =~ ^pkg-config[[:space:]]+--cflags[-+/._[:space:][:alnum:]]+$ ]]
     then flags+=($($o 2>/dev/null)) \
          || fatal $LINENO "$1:$i error: pkg-config failed\n\t$o\n\t^"
-    elif [[ $o =~ ^pkg-config[[:space:]]+--libs ]]
+    elif [[ $o =~ ^pkg-config[[:space:]]+--libs[-+/._[:space:][:alnum:]]+$   ]]
     then logic+=($($o 2>/dev/null)) \
          || fatal $LINENO "$1:$i error: pkg-config failed\n\t$o\n\t^"
     elif [ -f "$o" ]                             # Linker target
