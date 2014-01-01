@@ -3,7 +3,7 @@ set -eu
 [ $# -lt 1  ] && echo "Use $0 only as an interpreter" 1>&2 && exit $LINENO
 [ ! -f "$1" ] && echo "File '$1' does not exist"      1>&2 && exit $LINENO
 
-# Automatic cleanup of temporaries named somewhat like input filenames
+# Automatic cleanup of temporary files
 cout=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX.c") # Mangled source
 xout=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX.x") # Compiled binary
 trap 'rm -f "$cout" "$xout"' EXIT
