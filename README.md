@@ -9,7 +9,7 @@ For example, using this `~/.c99shrc`
     -Wall -g -O2
     #include <stdio.h>
 
-permits executing `hello <hello>`_ containing
+permits executing [hello](hello) containing
 
     #!/usr/bin/env c99sh
     int main()
@@ -17,12 +17,12 @@ permits executing `hello <hello>`_ containing
         puts("Hello, world!");
     }
 
-to produce the output one expects provided `c99sh <c99sh>`_ is in the path.
+to produce the output one expects provided [c99sh](c99sh) is in the path.
 
 Control files can supply compilation and linking flags, preprocessor directives
 like `#include`, and
 [pkg-config](http://www.freedesktop.org/wiki/Software/pkg-config/) directives.
-See `.c99shrc <.c99shrc>`_ for an extended example enabling
+See [.c99shrc](.c99shrc) for an extended example enabling
 [GSL](http://www.gnu.org/software/gsl/),
 [GLib](https://developer.gnome.org/glib/), and [SQLite](http://www.sqlite.org/)
 capabilities.
