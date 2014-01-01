@@ -3,10 +3,10 @@ set -eu
 [ $# -lt 1  ] && echo "Use $0 only as an interpreter" 1>&2 && exit $LINENO
 [ ! -f "$1" ] && echo "File '$1' does not exist"      1>&2 && exit $LINENO
 
-d=$(dirname "$1")                           # Directory of source
-c=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX.c") # Mangled source
-x=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX.x") # Compiled binary
-trap 'rm -f "$c" "$x"' EXIT                 # Automatic cleanup
+d=$(dirname "$1")                         # Directory of source
+c=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX") # Mangled source
+x=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX") # Compiled binary
+trap 'rm -f "$c" "$x"' EXIT               # Automatic cleanup
 
 # Process an rcfile given its filename
 declare -a flags=(${CFLAGS-} "-I$d")
@@ -46,6 +46,6 @@ sed "1s|^#!.*\$|#line 2 \"$1\"|" "$1" >> "$c"
 
 # Compile and execute with any remaining command line arguments
 # TODO Can exec "$x" be used and the cleanup trap still work?
-c99 -o "$x" "${flags[@]}" "${logic[@]}" 1>&2
+"${CC-cc}" -std=gnu99 -o "$x" "${flags[@]}" -x c "${logic[@]}" 1>&2
 shift
 "$x" "$@"
