@@ -5,9 +5,8 @@ set -eu
 
 # Automatic cleanup of temporaries named somewhat like input filenames
 cout=$(mktemp "${TMPDIR-/tmp}/c99sh.cout.XXXXXX.c") # Modified source
-eout=$(mktemp "${TMPDIR-/tmp}/c99sh.eout.XXXXXX.e") # Compiler errors
 xout=$(mktemp "${TMPDIR-/tmp}/c99sh.xout.XXXXXX.x") # Compiled binary
-trap 'rm -f "$cout" "$eout" "$xout"' EXIT
+trap 'rm -f "$cout" "$xout"' EXIT
 
 # Process a possibly non-existent rcfile given its filename
 # TODO Process each file at most once
@@ -47,15 +46,7 @@ process_rcfile "$dirn/.c99sh"
 echo "#line 1 \"$1\""                 >> "$cout"
 sed "1s|^#!.*\$|#line 2 \"$1\"|" "$1" >> "$cout"
 
-# Compile
-set +e
-c99 $CFLAGS -o "$xout" "-I$dirn" "$cout" $LDFLAGS > "$eout" 2>&1
-if [ $? -ne 0 ]; then
-    echo c99 $CFLAGS -o "$xout" "-I$dirn" "$cout" $LDFLAGS
-    cat "$eout"
-    exit 1
-fi
-
-# Execute with any remaining command line arguments
+# Compile and execute with any remaining command line arguments
+c99 $CFLAGS -o "$xout" "-I$dirn" "$cout" $LDFLAGS
 shift
 "$xout" "$@"
