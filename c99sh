@@ -4,39 +4,39 @@ fatal() { status=$1; shift; printf "$@" 1>&2; echo 1>&2; exit $status; }
 [ $# -lt 1  ] && fatal $LINENO "Use %s only as an interpreter" "$0"
 [ ! -f "$1" ] && fatal $LINENO "File '%s' does not exist"      "$1"
 
+d=$(dirname "$1")                         # Directory of input
+c=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX") # Mangled source to be compiled
+x=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX") # Compiled binary to be run
+trap 'rm -f "$c" "$x"' EXIT               # Automatic cleanup on exit
 
-d=$(dirname "$1")                         # Directory of source
-c=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX") # Mangled source
-x=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX") # Compiled binary
-trap 'rm -f "$c" "$x"' EXIT               # Automatic cleanup
-
-# Process an rcfile given its filename
-declare -a flags=(${CFLAGS-} "-I$d")
-declare -a logic=("$c" ${LDFLAGS-})
+# Logic for accumulating details from some named rcfile
+declare -a flags=(${CFLAGS-} "-I$d")      # CPPFLAGS, CFLAGS
+declare -a logic=("$c" ${LDFLAGS-})       # Sources, LDFLAGS, LIBS
 process_rcfile() {
   local i=0
-  while read -r o; do
-    echo "#line $((i+=1)) \"$1\" // $o" >> "$c"
-    if   [[ $o =~ ^[[:space:]]*\$     ]]  # Whitespace
+  while read -r o
+  do
+    echo "#line $((i+=1)) \"$1\" // $o" >> "$c"  # Record line in munged source
+    if   [  -z "$o"        ]                     # Skip empty lines
     then :
-    elif [[ $o =~ ^[[:space:]]*#      ]]  # Preprocessor
+    elif [[ $o =~ ^#      ]]                     # C preprocessor directives
     then echo "$o" >> "$c"
-    elif [[ $o =~ ^[[:space:]]*-[lLR] ]]  # Linker flags
+    elif [[ $o =~ ^-[lLR] ]]                     # Linker flags
     then logic+=($o)
-    elif [[ $o =~ ^[[:space:]]*-      ]]  # Compiler flags
+    elif [[ $o =~ ^-      ]]                     # Compiler flags
     then flags+=($o)
-    elif [[ $o =~ ^[[:space:]]*pkg-config[[:space:]]+--cflags ]]
-    then flags+=($(eval $(printf %q "$o")))
-    elif [[ $o =~ ^[[:space:]]*pkg-config[[:space:]]+--libs ]]
-    then logic+=($(eval $(printf %q "$o")))
-    elif [ -f "$o" ]                      # Linker target
+    elif [[ $o =~ ^pkg-config[[:space:]]+--cflags ]]
+    then flags+=($($o))
+    elif [[ $o =~ ^pkg-config[[:space:]]+--libs ]]
+    then logic+=($($o))
+    elif [ -f "$o" ]                             # Linker target
     then logic+=($o)
-    else fatal $LINENO "%s:%s:1 error: invalid c99sh\n\t%s\n\t^" "$1" "$i" "$o"
+    else fatal $LINENO "$1:$i:1 error: invalid c99sh option\n\t$o\n\t^"
     fi
-  done < "$1"
+  done < <(sed -e 's/^[[:space:]]*//;s/[[:space:]]*$//' "$1")
 }
 
-# Incorporate the first rcfile found
+# Process only the first rcfile found; permits directory-specific settings
 if   [ -f "$d/c99shrc" ]
 then process_rcfile "$d/c99shrc"
 elif [ -f "$HOME/.c99shrc" ]
@@ -51,7 +51,6 @@ echo "#line 1 \"$1\""                 >> "$c"
 sed "1s|^#!.*\$|#line 2 \"$1\"|" "$1" >> "$c"
 
 # Compile and execute with any remaining command line arguments
-# TODO Can exec "$x" be used and the cleanup trap still work?
 "${CC-cc}" -std=gnu99 -o "$x" "${flags[@]}" -x c "${logic[@]}" 1>&2
 shift
 "$x" "$@"
