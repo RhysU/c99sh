@@ -1,0 +1,61 @@
+#!/bin/bash
+set -eu
+[ $# -lt 1  ] && echo "Use $0 only as an interpreter" 1>&2 && exit $LINENO
+[ ! -f "$1" ] && echo "File '$1' does not exist"      1>&2 && exit $LINENO
+
+# Automatic cleanup of temporaries named somewhat like input filenames
+cout=$(mktemp "${TMPDIR-/tmp}/c99sh.cout.XXXXXX.c") # Modified source
+eout=$(mktemp "${TMPDIR-/tmp}/c99sh.eout.XXXXXX.e") # Compiler errors
+xout=$(mktemp "${TMPDIR-/tmp}/c99sh.xout.XXXXXX.x") # Compiled binary
+trap 'rm -f "$cout" "$eout" "$xout"' EXIT
+
+# Process a possibly non-existent rcfile given its filename
+# TODO Process each file at most once
+# TODO Failed preprocessing stuff pointing to .c99sh file
+: ${LDFLAGS:=} ${CFLAGS:=}
+process_rcfile() {
+    if [ -f "$1" ]; then
+        while read -r line; do
+            if   [[ $line =~ ^[[:space:]]*#                             ]]; then
+                echo "$line" >> "$cout"
+            elif [[ $line =~ ^[[:space:]]*-[lLR]                        ]]; then
+                LDFLAGS+=$line
+                LDFLAGS+=" "
+            elif [[ $line =~ ^[[:space:]]*pkg-config[[:space:]]+--lib   ]]; then
+                LDFLAGS+=$(eval "$(printf %q "$line")")
+                LDFLAGS+=" "
+            elif [[ $line =~ ^[[:space:]]*pkg-config[[:space:]]+--cflag ]]; then
+                CFLAGS+=$( eval "$(printf %q "$line")")
+                CFLAGS+=" "
+            else
+                CFLAGS+=$line
+                CFLAGS+=" "
+            fi
+        done < "$1"
+    fi
+}
+
+# Process all relevant rcfiles
+dirn=$(dirname "$1")
+process_rcfile "$HOME/.c99sh"
+process_rcfile "$dirn/.c99sh"
+
+# Prepare source files for "interpretation" by the compiler.
+# Possibly swap shebang on first line of each with a line pragma so
+#   (a) the source can be compiled, and
+#   (b) errors and warnings show usable line numbers.
+echo "#line 1 \"$1\""                 >> "$cout"
+sed "1s|^#!.*\$|#line 2 \"$1\"|" "$1" >> "$cout"
+
+# Compile
+set +e
+c99 $CFLAGS -o "$xout" "-I$dirn" "$cout" $LDFLAGS > "$eout" 2>&1
+if [ $? -ne 0 ]; then
+    echo c99 $CFLAGS -o "$xout" "-I$dirn" "$cout" $LDFLAGS
+    cat "$eout"
+    exit 1
+fi
+
+# Execute with any remaining command line arguments
+shift
+"$xout" "$@"
