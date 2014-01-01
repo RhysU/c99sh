@@ -13,19 +13,24 @@ declare -a flags=(${CFLAGS-} "-I$d")
 declare -a logic=("$c" ${LDFLAGS-})
 process_rcfile() {
   local i=0
-  while read -r line; do
-    echo "#line $((i+=1)) \"$1\" // $line" >> "$c"
-    if   [ -z "$line" ]
+  while read -r o; do
+    echo "#line $((i+=1)) \"$1\" // $o" >> "$c"
+    if   [[ $o =~ ^[[:space:]]*\$     ]]  # Whitespace
     then :
-    elif [[ $line =~ ^[[:space:]]*# ]]
-    then echo "$line" >> "$c"
-    elif [[ $line =~ ^[[:space:]]*-[lLR] ]]
-    then logic+=("$line")
-    elif [[ $line =~ ^[[:space:]]*pkg-config[[:space:]]+--libs ]]
-    then logic+=($(eval "$line")) # FIXME Glaring security bug
-    elif [[ $line =~ ^[[:space:]]*pkg-config[[:space:]]+--cflags ]]
-    then flags+=($(eval "$line")) # FIXME Glaring security concern
-    else flags+=($line)
+    elif [[ $o =~ ^[[:space:]]*#      ]]  # Preprocessor
+    then echo "$o" >> "$c"
+    elif [[ $o =~ ^[[:space:]]*-[lLR] ]]  # Linker flags
+    then logic+=($o)
+    elif [[ $o =~ ^[[:space:]]*-      ]]  # Compiler flags
+    then flags+=($o)
+    elif [[ $o =~ ^[[:space:]]*pkg-config[[:space:]]+--cflags ]]
+    then flags+=($(eval $(printf %q "$o")))
+    elif [[ $o =~ ^[[:space:]]*pkg-config[[:space:]]+--libs ]]
+    then logic+=($(eval $(printf %q "$o")))
+    elif [ -f "$o" ]                      # Linker target
+    then logic+=($o)
+    else printf "%s:%s:1 error: invalid c99sh\n\t%s\n\t^\n" "$1" "$i" "$o" 1>&2
+         exit $LINENO
     fi
   done < "$1"
 }
