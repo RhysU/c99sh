@@ -13,11 +13,13 @@ trap 'rm -f "$cout" "$xout"' EXIT
 declare -a flags=(${CFLAGS-} "-I$dirn")
 declare -a sources=("$cout" ${LDFLAGS-})
 process_rcfile() {
+  local i=0
   while read -r line; do
+    echo "#line $((i+=1)) \"$1\" // $line" >> "$cout"
     if   [ -z "$line" ]
     then :
     elif [[ $line =~ ^[[:space:]]*# ]]
-    then echo "$line" >> "$cout" # TODO Implicate '#line NNN rcfile'
+    then echo "$line" >> "$cout"
     elif [[ $line =~ ^[[:space:]]*-[lLR] ]]
     then sources+=("$line")
     elif [[ $line =~ ^[[:space:]]*pkg-config[[:space:]]+--libs ]]
@@ -44,7 +46,7 @@ echo "#line 1 \"$1\""                 >> "$cout"
 sed "1s|^#!.*\$|#line 2 \"$1\"|" "$1" >> "$cout"
 
 # Compile and execute with any remaining command line arguments
-c99 -o "$xout" "${flags[@]}" "${sources[@]}"
+c99 -o "$xout" "${flags[@]}" "${sources[@]}" 1>&2
 shift
 # TODO Can exec be used and the cleanup trap still executed?
 "$xout" "$@"
