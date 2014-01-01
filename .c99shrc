@@ -1,0 +1,38 @@
+-Wall
+-Wextra
+-g -O2 -mtune=native
+
+#include <alloca.h>
+#include <assert.h>
+#include <ctype.h>
+#include <errno.h>
+#include <limits.h>
+#include <regex.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/types.h>
+#include <tgmath.h>
+#include <time.h>
+
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_errno.h>
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_statistics.h>
+pkg-config --cflags gsl
+pkg-config --libs   gsl
+
+#include <glib.h>
+pkg-config --cflags glib-2.0
+pkg-config --libs   glib-2.0
+
+#include <sqlite3.h>
+pkg-config --cflags sqlite3
+pkg-config --libs   sqlite3
+
+-lm

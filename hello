@@ -1,0 +1,6 @@
+#!/usr/bin/env c99sh
+int main()
+{
+    printf("Hello, world!\n");
+}
+// vim:syntax=c
