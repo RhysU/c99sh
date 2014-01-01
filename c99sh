@@ -4,15 +4,15 @@ set -eu
 [ ! -f "$1" ] && echo "File '$1' does not exist"      1>&2 && exit $LINENO
 
 # Automatic cleanup of temporary files
+dirn=$(dirname "$1")
 cout=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX.c") # Mangled source
 xout=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX.x") # Compiled binary
 trap 'rm -f "$cout" "$xout"' EXIT
 
-# Process a possibly non-existent rcfile given its filename
-declare -a flags=(${CFLAGS-} "-I$(dirname "$1")")
+# Process an rcfile given its filename
+declare -a flags=(${CFLAGS-} "-I$dirn")
 declare -a sources=("$cout" ${LDFLAGS-})
 process_rcfile() {
-  [ ! -f "$1" ] && return 0
   while read -r line; do
     if   [ -z "$line" ]
     then :
@@ -29,9 +29,12 @@ process_rcfile() {
   done < "$1"
 }
 
-# Process any relevant rcfiles
-process_rcfile "$HOME/.c99shrc"
-[ "$PWD" != "$HOME" ] && process_rcfile "$PWD/.c99shrc"
+# Incorporate the first rcfile found
+if   [ -f "$dirn/c99shrc" ]
+then process_rcfile "$dirn/c99shrc"
+elif [ -f "$HOME/.c99shrc" ]
+then process_rcfile "$HOME/.c99shrc"
+fi
 
 # Prepare source files for "interpretation" by the compiler.
 # Possibly swap shebang on first line of each with a line pragma so
