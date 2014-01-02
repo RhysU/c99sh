@@ -4,7 +4,6 @@ c99sh
 A shebang-friendly script for "interpreting" single C99 files, including
 rudimentary rcfile support.
 
-
 For example, installing this `~/.c99shrc` control file
 
     -Wall -g -O2
