@@ -18,7 +18,7 @@ permits executing [hello](hello) containing
     }
 
 to produce the output one expects provided [c99sh](c99sh) is in the path. You
-may also run `c99sh foo.c` to execute some `foo.c` lacking the shebang lang.
+may also run `c99sh foo.c` to execute some `foo.c` lacking the shebang line.
 
 Control files can supply compilation and linking flags, preprocessor directives
 like `#include`, and
