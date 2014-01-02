@@ -67,7 +67,7 @@ prototyping or analysis.  It is nice when useful one-off scripts can be moved
 directly into C ABI code instead of requiring an additional
 {Python,Octave,R}-to-C translation and debugging phase.
 
-The idea for `c99sh` was came from [21st Century
+The idea for `c99sh` came from [21st Century
 C](http://shop.oreilly.com/product/0636920025108.do)'s section "Compiling C
 Programs via Here Document" ([available
 online](http://cdn.oreilly.com/oreilly/booksamplers/9781449327149_sampler.pdf))
