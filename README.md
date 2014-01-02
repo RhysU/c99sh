@@ -9,7 +9,7 @@ For example, installing this `~/.c99shrc` control file
     -Wall -g -O2
     #include <stdio.h>
 
-permits executing [hello](hello) containing
+permits executing [hello](basic/hello) containing
 
     #!/usr/bin/env c99sh
     int main()
