@@ -29,7 +29,7 @@ like `#include`, and
 [pkg-config](http://www.freedesktop.org/wiki/Software/pkg-config/) directives
 to simplify library usage. A `c99shrc` located in the same directory as the
 interpreted source will be used. Otherwise a `~/.c99shrc` is processed if
-available. See [c99shrc.example](c99shrc.example) for an extended example
+available. See [c99shrc.example](c99shrc.example) for an extended control file
 enabling [GSL](http://www.gnu.org/software/gsl/),
 [GLib](https://developer.gnome.org/glib/), and [SQLite](http://www.sqlite.org/)
 capabilities.  This permits quickly getting access to higher-level data
