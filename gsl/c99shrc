@@ -1,0 +1,15 @@
+-Wall
+-g -O2
+
+#include <stdio.h>
+#include <tgmath.h>
+
+#include <gsl/gsl_errno.h>
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_math.h>
+#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_poly.h>
+#include <gsl/gsl_statistics.h>
+#include <gsl/gsl_vector.h>
+pkg-config --cflags gsl
+pkg-config --libs   gsl

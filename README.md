@@ -65,7 +65,10 @@ Take that, [GIL](http://en.wikipedia.org/wiki/Global_Interpreter_Lock).
 Kidding aside, the speedup in the edit-compile-run loop can be handy during
 prototyping or analysis.  It is nice when useful one-off scripts can be moved
 directly into C ABI code instead of requiring an additional
-{Python,Octave,R}-to-C translation and debugging phase.
+{Python,Octave,R}-to-C translation and debugging phase.  For example, compare
+the [Octave version](gsl/nozzle_match.m) of some simple logic with the
+[equivalent c99sh-based version](gsl/nozzle_match) requiring only a few
+[one-time additions](gsl/c99shrc) to your `~/.c99shrc`.
 
 The idea for `c99sh` came from [21st Century
 C](http://shop.oreilly.com/product/0636920025108.do)'s section "Compiling C
