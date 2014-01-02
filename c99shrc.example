@@ -18,6 +18,11 @@
 #include <tgmath.h>
 #include <time.h>
 
+-fopenmp
+#ifdef _OPENMP
+# include <omp.h>
+#endif
+
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_vector.h>
