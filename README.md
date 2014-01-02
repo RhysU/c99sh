@@ -69,8 +69,8 @@ directly into C ABI code instead of requiring an additional
 
 The idea for `c99sh` was came from [21st Century
 C](http://shop.oreilly.com/product/0636920025108.do)'s section "Compiling C
-Programs via Here Document" by [Ben Klemens](http://ben.klemens.org/)
-([available
-online](http://cdn.oreilly.com/oreilly/booksamplers/9781449327149_sampler.pdf)).
-Additionally, I wrote it somewhat in reaction to browsing the C++-ish work by
+Programs via Here Document" ([available
+online](http://cdn.oreilly.com/oreilly/booksamplers/9781449327149_sampler.pdf))
+by [Ben Klemens](http://ben.klemens.org/). Additionally, I wrote it somewhat in
+reaction to browsing the C++-ish work by
 [elsamuko/cppsh](https://github.com/elsamuko/cppsh).
