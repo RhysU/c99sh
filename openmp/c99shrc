@@ -1,0 +1,14 @@
+-Wall
+-g -O3 -mtune=native
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+-lm
+
+-fopenmp
+#ifdef _OPENMP
+# include <omp.h>
+#else
+# define omp_get_thread_num() 0
+#endif
