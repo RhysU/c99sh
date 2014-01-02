@@ -1,13 +1,23 @@
 #!/bin/bash
 # c99sh: A shebang-friendly script for "interpreting" single C99 files
 # from https://github.com/rhysu/c99sh.  Subject to the Simplified BSD License.
-
 set -eu
+
+# Process c99sh flags (not arguments to the interpreted script)
+declare -i v=0
+while getopts v flag; do
+  case $flag in
+    v) ((v+=1)) ;; # Try -v, -vv, etc. to increase verbosity
+    ?) exit;    ;;
+  esac
+done
+shift $((OPTIND-1))
+
 fatal() { status=$1; shift; printf "$@" 1>&2; echo 1>&2; exit $status; }
 [ $# -lt 1  ] && fatal $LINENO "Use %s only as an interpreter" "$0"
 [ ! -f "$1" ] && fatal $LINENO "File '%s' does not exist"      "$1"
 
-d=$(dirname "$1")                         # Directory of input
+d=$(dirname "$1")                         # Directory of input file
 c=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX") # Mangled source to be compiled
 x=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX") # Compiled binary to be run
 trap 'rm -f "$c" "$x"' EXIT               # Automatic cleanup on exit
@@ -55,6 +65,9 @@ echo "#line 1 \"$1\""                 >> "$c"
 sed "1s|^#!.*\$|#line 2 \"$1\"|" "$1" >> "$c"
 
 # Compile and execute with any remaining command line arguments
-"${CC-cc}" -std=gnu99 -o "$x" "${flags[@]}" -x c "${logic[@]}" 1>&2
 shift
+[ $v -ge 1 ] && set -x
+[ $v -ge 2 ] && cat "$c" 1>&2
+"${CC-cc}" -std=gnu99 -o "$x" "${flags[@]}" -x c "${logic[@]}" 1>&2
 "$x" "$@"
+set +x
