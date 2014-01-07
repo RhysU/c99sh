@@ -34,7 +34,7 @@ capabilities.  This permits quickly getting access to higher-level data
 structures.
 
 A more entertaining example is an [OpenMP](http://openmp.org/wp/)-enabled Monte
-Carlo computation of Pi screaming like a banshee on all your cores
+Carlo computation of π screaming like a banshee on all your cores
 ([c99shrc](openmp/c99shrc), [source](openmp/pi)):
 
     #!/usr/bin/env c99sh
