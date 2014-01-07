@@ -27,7 +27,7 @@ declare -a flags=(${CFLAGS-} "-I$d")      # CPPFLAGS, CFLAGS
 declare -a logic=("$c" ${LDFLAGS-})       # Sources, LDFLAGS, LIBS
 process_rcfile() {
   local i=0
-  while read -r o; do
+  while IFS=$' \t\n' read -r o; do
     echo "#line $((i+=1)) \"$1\" // $o" >> "$c"  # Record line in munged source
     if   [  -z "$o"        ]                     # Skip empty lines
     then :
@@ -47,7 +47,7 @@ process_rcfile() {
     then logic+=($o)
     else fatal $LINENO "$1:$i error: non-existent or unknown option\n\t$o\n\t^"
     fi
-  done < <(sed -e 's/^[[:space:]]*//;s/[[:space:]]*$//' "$1")
+  done < "$1"
 }
 
 # Process only the first rcfile found; permits directory-specific settings
