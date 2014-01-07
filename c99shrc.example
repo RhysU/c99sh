@@ -30,6 +30,7 @@
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_poly.h>
+#include <gsl/gsl_rng.h>
 #include <gsl/gsl_statistics.h>
 #include <gsl/gsl_vector.h>
 pkg-config --cflags gsl
