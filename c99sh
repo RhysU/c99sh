@@ -74,8 +74,7 @@ echo "#line 1 \"$f\""            >> "$c"
 sed "1s|^#!.*\$|#line 2 \"$f\"|" >> "$c"
 
 # Compile and execute with any remaining command line arguments
-[ $v -ge 1 ] && set -x
 [ $v -ge 2 ] && cat "$c" 1>&2
+[ $v -ge 1 ] && set -x
 "${CC-cc}" -std=gnu99 -o "$x" "${flags[@]}" -x c "${logic[@]}" 1>&2
 "$x" "$@"
-set +x
