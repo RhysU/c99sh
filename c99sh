@@ -1,7 +1,17 @@
 #!/bin/bash
 # c99sh: A shebang-friendly script for "interpreting" single C99 files
 # from https://github.com/rhysu/c99sh.  Subject to the Simplified BSD License.
+# Implementation deliberately jumps through hoops to reduce process spawning.
 set -eu
+shopt -s extglob
+
+# Maps requested pkg-config packages to the origin of the request
+declare -A pkg
+stderr_pkgs() {
+    for n in ${!pkg[@]}; do
+        echo "info: ${pkg[$n]} requested package $n" 1>&2
+    done
+}
 
 # Process c99sh flags (not arguments to the interpreted script)
 declare -i v=0
@@ -46,12 +56,16 @@ process_rcfile() {
     then logic+=($o)
     elif [[ $o =~ ^-      ]]                     # Compiler flags
     then flags+=($o)
-    elif [[ $o =~ ^pkg-config[[:space:]]+--cflags[-+/._[:space:][:alnum:]]+$ ]]
-    then flags+=($($o 2>/dev/null)) \
-         || fatal $LINENO "$1:$i error: pkg-config failed\n\t$o\n\t^"
-    elif [[ $o =~ ^pkg-config[[:space:]]+--libs[-+/._[:space:][:alnum:]]+$   ]]
-    then logic+=($($o 2>/dev/null)) \
-         || fatal $LINENO "$1:$i error: pkg-config failed\n\t$o\n\t^"
+    elif [[ $o =~ ^pkg-config[[:space:]]+ ]]     # Declaration for pkg-config..
+    then local p=${o##pkg-config+([[:space:]])}  # ..requires lengthier parsing
+         if   [[ $p =~ ^--cflags ]]
+         then fatal $LINENO "$1:$i error: extraneous '--cflags'\n\t$o\n\t^"
+         elif [[ $p =~ ^--libs   ]]
+         then fatal $LINENO "$1:$i error: extraneous '--libs'\n\t$o\n\t^"
+         elif [[ $p =~ ^[-+/._[:space:][:alnum:]]+$ ]]
+         then for q in $p; do pkg[$q]="$1:$i"; done
+         else fatal $LINENO "$1:$i error: invalid package name(s)\n\t$o\n\t^"
+         fi
     elif [ -f "$o" ]                             # Linker target
     then logic+=($o)
     else fatal $LINENO "$1:$i error: non-existent or unknown option\n\t$o\n\t^"
@@ -64,6 +78,16 @@ if   [ -f "$d/c99shrc" ]
 then process_rcfile "$d/c99shrc"
 elif [ -f "$HOME/.c99shrc" ]
 then process_rcfile "$HOME/.c99shrc"
+fi
+
+# Combine all package requests to permit invoking pkg-config at most twice
+# Also permits smart merging of results and package conflict detection
+# Causes all pkg-config --libs to appear after linker targets.  Ok?
+if [ ${#pkg[@]} -gt 0 ]
+then flags+=($(pkg-config --cflags ${!pkg[@]})) || (echo 1>&2; stderr_pkgs; \
+        fatal $LINENO "error: failure obtaining --cflags from pkg-config")
+     logic+=($(pkg-config --libs   ${!pkg[@]})) || (echo 1>&2; stderr_pkgs; \
+        fatal $LINENO "error: failure obtaining --libs from pkg-config")
 fi
 
 # Prepare source from standard input for "interpretation" by the compiler.

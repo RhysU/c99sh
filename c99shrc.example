@@ -36,15 +36,12 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_statistics.h>
 #include <gsl/gsl_vector.h>
-pkg-config --cflags gsl
-pkg-config --libs   gsl
+pkg-config gsl
 
 #include <glib.h>
-pkg-config --cflags glib-2.0
-pkg-config --libs   glib-2.0
+pkg-config glib-2.0
 
 #include <sqlite3.h>
-pkg-config --cflags sqlite3
-pkg-config --libs   sqlite3
+pkg-config sqlite3
 
 -lm
