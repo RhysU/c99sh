@@ -15,10 +15,11 @@ stderr_pkgs() {
 
 # Process c99sh flags (not arguments to the interpreted script)
 declare -i v=0
-while getopts v flag; do
+while getopts p:v flag; do
   case $flag in
-    v) ((v+=1)) ;; # Try -v, -vv, etc. to increase verbosity
-    ?) exit;    ;;
+    p) pkg[$OPTARG]="flag -$flag" ;; # Record requested package
+    v) ((v+=1))                   ;; # Try -v, -vv, etc. to increase verbosity
+    ?) exit;                      ;;
   esac
 done
 shift $((OPTIND-1))
