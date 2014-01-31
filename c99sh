@@ -15,9 +15,10 @@ stderr_pkgs() {
 
 # Process c99sh flags (not arguments to the interpreted script)
 declare -i v=0
-while getopts p:v flag; do
+while getopts p:r:v flag; do
   case $flag in
     p) pkg[$OPTARG]="flag -$flag" ;; # Record requested package
+    r) r=$OPTARG                  ;; # Record requested rcfile
     v) ((v+=1))                   ;; # Try -v, -vv, etc. to increase verbosity
     ?) exit;                      ;;
   esac
@@ -74,8 +75,10 @@ process_rcfile() {
   done < "$1"
 }
 
-# Process only the first rcfile found; permits directory-specific settings
-if   [ -f "$d/c99shrc" ]
+# Process only the first rcfile; permits directory-specific settings
+if   [ -n "${r-}" ]
+then process_rcfile "$r"
+elif [ -f "$d/c99shrc" ]
 then process_rcfile "$d/c99shrc"
 elif [ -f "$HOME/.c99shrc" ]
 then process_rcfile "$HOME/.c99shrc"
