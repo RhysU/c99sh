@@ -4,6 +4,7 @@
 # Implementation deliberately jumps through hoops to reduce process spawning.
 set -eu
 shopt -s extglob
+name=${0##*/}
 
 # Maps requested pkg-config packages to the origin of the request
 declare -A pkg
@@ -14,11 +15,30 @@ stderr_pkgs() {
 }
 
 # Process c99sh flags (not arguments to the interpreted script)
+help="\
+Usage: ${name} [OPTION]... [--] PROGRAM [PROGRAMOPTION]...
+ or:   ${name} [OPTION]... [--] -       [PROGRAMOPTION]...
+ or:   ${name} [OPTION]... [--]
+Compile C99 PROGRAM, or standard input, and run it supplying [PROGRAMOPTION]...
+
+Options:
+  -h    \tDisplay this help message
+  -p PKG\tMake PKG headers and libraries available to PROGRAM via pkg-config(1)
+  -r RC \tLoad compilation settings from RC suppressing normal rcfile search
+  -v    \tIncrease verbosity; may be supplied multiple times
+
+An rcfile "${name}rc" controls compilation if present in the same directory as
+PROGRAM, or if present in the current working directory when processing standard
+input.  Otherwise, if it exists, the file ~/.${name}rc controls compilation.
+
+If compilation is successful, the exit status is that of PROGRAM.
+"
 declare -i v=0
-while getopts p:r:v flag; do
+while getopts hp:r:v flag; do
   case $flag in
-    p) pkg[$OPTARG]="flag -$flag" ;; # Record requested package
-    r) r=$OPTARG                  ;; # Record requested rcfile
+    h) exec echo -ne "$help"      ;; # Stops processing due to exec
+    p) pkg[$OPTARG]="flag -$flag" ;; # Additively record requested package
+    r) r=$OPTARG                  ;; # Record requested rcfile, last one wins
     v) ((v+=1))                   ;; # Try -v, -vv, etc. to increase verbosity
     ?) exit;                      ;;
   esac
@@ -78,10 +98,10 @@ process_rcfile() {
 # Process only the first rcfile; permits directory-specific settings
 if   [ -n "${r-}" ]
 then process_rcfile "$r"
-elif [ -f "$d/c99shrc" ]
-then process_rcfile "$d/c99shrc"
-elif [ -f "$HOME/.c99shrc" ]
-then process_rcfile "$HOME/.c99shrc"
+elif [ -f "$d/${name}rc" ]
+then process_rcfile "$d/${name}rc"
+elif [ -f "$HOME/.${name}rc" ]
+then process_rcfile "$HOME/.${name}rc"
 fi
 
 # Combine all package requests to permit invoking pkg-config at most twice
