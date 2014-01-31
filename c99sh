@@ -19,7 +19,7 @@ help="\
 Usage: ${name} [OPTION]... [--] PROGRAM [PROGRAMOPTION]...
  or:   ${name} [OPTION]... [--] -       [PROGRAMOPTION]...
  or:   ${name} [OPTION]... [--]
-Compile C99 PROGRAM, or standard input, and run it supplying [PROGRAMOPTION]...
+Compile ${name:0:3} PROGRAM, or standard input, and run it supplying [PROGRAMOPTION]...
 
 Options:
   -h    \tDisplay this help message
@@ -124,5 +124,15 @@ sed "1s|^#!.*\$|#line 2 \"$f\"|" >> "$c"
 # Compile and execute with any remaining command line arguments
 [ $v -ge 2 ] && cat "$c" 1>&2
 [ $v -ge 1 ] && set -x
-"${CC-cc}" -std=gnu99 -o "$x" "${flags[@]}" -x c "${logic[@]}" 1>&2
+case "${name:0:3}" in
+  c99|C99)
+    "${CC-cc}"   -std=gnu99   -o "$x" "${flags[@]}" -x c   "${logic[@]}" 1>&2
+    ;;
+  cxx|CXX)
+    "${CXX-c++}" -std=gnu++0x -o "$x" "${flags[@]}" -x c++ "${logic[@]}" 1>&2
+    ;;
+  *)
+    fatal $LINENO "error: unrecognized language prefix - ${name:0:3}"
+    ;;
+esac
 "$x" "$@"
