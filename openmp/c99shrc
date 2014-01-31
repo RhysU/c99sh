@@ -1,5 +1,5 @@
 -Wall
--g -O3 -mtune=native
+-g -O3
 
 #include <stdio.h>
 #include <stdlib.h>

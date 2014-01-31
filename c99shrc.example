@@ -1,6 +1,6 @@
 -Wall
 -Wextra
--g -O2 -mtune=native
+-g -O2
 
 #include <alloca.h>
 #include <assert.h>
