@@ -18,14 +18,20 @@ permits executing [hello](basic/hello) containing
     }
 
 to produce the output one expects provided [c99sh](c99sh) is in the path. You
-may also run `c99sh foo.c` to execute some `foo.c` lacking the shebang line.
-Try `c99sh -v foo.c` if you encounter trouble and want to see the compilation
-command.
+may also run `c99sh foo.c` to execute some `foo.c` lacking the shebang line. Try
+`c99sh -v foo.c` if you encounter trouble and want to see the compilation
+command. Check out `c99sh -h` for all the command line options you might use. In
+particular, for simple tasks you might find that the command line options in
+conjunction with HERE documents can accomplish many things.  For example,
+
+    $ ./c99sh -sm <<HERE
+    puts("Hello, world!");
+    HERE
 
 Control files can supply compilation and linking flags, preprocessor directives
 like `#include`, and
-[pkg-config](http://www.freedesktop.org/wiki/Software/pkg-config/) directives
-to simplify library usage. A `c99shrc` located in the same directory as the
+[pkg-config](http://www.freedesktop.org/wiki/Software/pkg-config/) directives to
+simplify library usage. A `c99shrc` located in the same directory as the
 interpreted source will be used. Otherwise a `~/.c99shrc` is processed if
 available. See [c99shrc.example](c99shrc.example) for an extended control file
 enabling [GSL](http://www.gnu.org/software/gsl/),
