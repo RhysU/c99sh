@@ -23,6 +23,7 @@ Compile ${name:0:3} PROGRAM, or standard input, and run it supplying [PROGRAMOPT
 
 Options:
   -h    \tDisplay this help message
+  -m    \tWrap input in canonical main declaration exposing argc, argv
   -p PKG\tMake PKG headers and libraries available to PROGRAM via pkg-config(1)
   -r RC \tLoad compilation settings from RC suppressing normal rcfile search
   -s    \tInclude all standard headers defined by ISO/IEC 9899:1999
@@ -34,13 +35,14 @@ input.  Otherwise, if it exists, the file ~/.${name}rc controls compilation.
 
 If compilation is successful, the exit status is that of PROGRAM.
 "
-declare -i s=0 v=0
-while getopts hp:r:sv flag; do
+declare -i m=0 s=0 v=0
+while getopts hmp:r:sv flag; do
   case $flag in
     h) exec echo -ne "$help"      ;; # Stops processing due to exec
+    m) m=1                        ;; # To be processed later
     p) pkg[$OPTARG]="flag -$flag" ;; # Additively record requested package
     r) r=$OPTARG                  ;; # Record requested rcfile, last one wins
-    s) s=1                        ;; # Processing 
+    s) s=1                        ;; # To be processed later
     v) ((v+=1))                   ;; # Try -v, -vv, etc. to increase verbosity
     ?) exit;                      ;;
   esac
@@ -128,12 +130,25 @@ then flags+=($(pkg-config --cflags ${!pkg[@]})) || (echo 1>&2; stderr_pkgs; \
         fatal $LINENO "error: failure obtaining --libs from pkg-config")
 fi
 
+# If requested, open main function about input suppressing unused argc, argv
+if [ $m -gt 0 ]
+then echo "#line $LINENO \"$0\""               >> "$c"
+     echo "int main(int argc, char *argv[]) {" >> "$c"
+     echo "(void) argc; (void) argv;"          >> "$c"
+fi
+
 # Prepare source from standard input for "interpretation" by the compiler.
 # Possibly swap shebang on first input line with a preprocessor line pragma so
 #   (a) the source can be compiled without an unknown pragma warning, and
 #   (b) errors and warnings within the file show usable line information
 echo "#line 1 \"$f\""            >> "$c"
 sed "1s|^#!.*\$|#line 2 \"$f\"|" >> "$c"
+
+# If requested, close main function about input
+if [ $m -gt 0 ]
+then echo "#line $LINENO \"$0\"" >> "$c"
+     echo "} /*main*/"           >> "$c"
+fi
 
 # Compile and execute with any remaining command line arguments
 [ $v -ge 2 ] && cat "$c" 1>&2
