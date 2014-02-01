@@ -25,6 +25,7 @@ Options:
   -h    \tDisplay this help message
   -p PKG\tMake PKG headers and libraries available to PROGRAM via pkg-config(1)
   -r RC \tLoad compilation settings from RC suppressing normal rcfile search
+  -s    \tInclude all standard headers defined by ISO/IEC 9899:1999
   -v    \tIncrease verbosity; may be supplied multiple times
 
 An rcfile "${name}rc" controls compilation if present in the same directory as
@@ -33,12 +34,13 @@ input.  Otherwise, if it exists, the file ~/.${name}rc controls compilation.
 
 If compilation is successful, the exit status is that of PROGRAM.
 "
-declare -i v=0
-while getopts hp:r:v flag; do
+declare -i s=0 v=0
+while getopts hp:r:sv flag; do
   case $flag in
     h) exec echo -ne "$help"      ;; # Stops processing due to exec
     p) pkg[$OPTARG]="flag -$flag" ;; # Additively record requested package
     r) r=$OPTARG                  ;; # Record requested rcfile, last one wins
+    s) s=1                        ;; # Processing 
     v) ((v+=1))                   ;; # Try -v, -vv, etc. to increase verbosity
     ?) exit;                      ;;
   esac
@@ -59,6 +61,18 @@ fi
 c=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX") # Mangled source to be compiled
 x=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX") # Compiled binary to be run
 trap 'rm -f "$c" "$x"' EXIT               # Automatic cleanup on exit
+
+# If requested, include all standard C99 headers in either C or C++ fashion
+if [ $s -gt 0 ]
+then echo "#line $LINENO \"$0\"" >> "$c"
+     head=( assert complex ctype errno fenv float inttypes iso646
+            limits locale math setjmp signal stdarg stdbool stddef
+            stdint stdio stdlib string tgmath time wchar wctype )
+     case "${name:0:3}" in
+     c99|C99) for h in ${head[@]}; do echo "#include <${h}.h>" >> "$c"; done ;;
+     cxx|CXX) for h in ${head[@]}; do echo "#include <c${h}>"  >> "$c"; done ;;
+     esac
+fi
 
 # Assists in reporting formatted errors to stderr followed by exiting
 fatal() { status=$1; shift; printf "$@" 1>&2; echo 1>&2; exit $status; }
