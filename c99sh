@@ -7,7 +7,7 @@ shopt -s extglob
 name=${0##*/}
 
 # Maps requested pkg-config packages to the origin of the request
-declare -A pkg
+declare -A pkg=()
 stderr_pkgs() {
     for n in ${!pkg[@]}; do
         echo "info: ${pkg[$n]} requested package $n" 1>&2
