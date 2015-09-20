@@ -22,12 +22,12 @@ Usage: ${name} [OPTION]... [--] PROGRAM [PROGRAMOPTION]...
 Compile ${name:0:3} PROGRAM, or standard input, and run it supplying [PROGRAMOPTION]...
 
 Options:
-  -h    \tDisplay this help message
-  -m    \tWrap input in canonical main declaration exposing argc, argv
-  -p PKG\tMake PKG headers and libraries available to PROGRAM via pkg-config(1)
-  -r RC \tLoad compilation settings from RC suppressing normal rcfile search
-  -s    \tInclude all standard headers defined by ISO/IEC 9899:1999
-  -v    \tIncrease verbosity; may be supplied multiple times
+  -h      Display this help message
+  -m      Wrap input in canonical main declaration exposing argc, argv
+  -p PKG  Make PKG headers and libraries available to PROGRAM via pkg-config(1)
+  -r RC   Load compilation settings from RC suppressing normal rcfile search
+  -s      Include all standard headers defined by ISO/IEC 9899:1999
+  -v      Increase verbosity; may be supplied multiple times
 
 An rcfile "${name}rc" controls compilation if present in the same directory as
 PROGRAM, or if present in the current working directory when processing standard
