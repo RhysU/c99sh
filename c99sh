@@ -154,11 +154,14 @@ fi
 [ $v -ge 2 ] && cat "$c" 1>&2
 [ $v -ge 1 ] && set -x
 case "${name:0:3}" in
+  c11|C11)
+    "${CC-cc}"   -std=gnu11   -o "$x" "${flags[@]}" -x c   "${logic[@]}" 1>&2
+    ;;
   c99|C99)
     "${CC-cc}"   -std=gnu99   -o "$x" "${flags[@]}" -x c   "${logic[@]}" 1>&2
     ;;
   cxx|CXX)
-    "${CXX-c++}" -std=gnu++0x -o "$x" "${flags[@]}" -x c++ "${logic[@]}" 1>&2
+    "${CXX-c++}" -std=gnu++11 -o "$x" "${flags[@]}" -x c++ "${logic[@]}" 1>&2
     ;;
   *)
     fatal $LINENO "error: unrecognized language prefix - ${name:0:3}"
