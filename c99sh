@@ -60,9 +60,9 @@ then if   [ "$1" != "-" ]
      shift 1
 fi
 
-c=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX") # Mangled source to be compiled
-x=$(mktemp "${TMPDIR-/tmp}/c99sh.XXXXXX") # Compiled binary to be run
-trap 'rm -f "$c" "$x"' EXIT               # Automatic cleanup on exit
+c=$(mktemp "${TMPDIR-/tmp}/${name:0:3}sh.XXXXXX") # Mangled source for compiling
+x=$(mktemp "${TMPDIR-/tmp}/${name:0:3}sh.XXXXXX") # Compiled binary to be run
+trap 'rm -f "$c" "$x"' EXIT                       # Automatic cleanup on exit
 
 # If requested, include all standard C99 headers in either C or C++ fashion
 if [ $s -gt 0 ]
@@ -72,6 +72,7 @@ then echo "#line $LINENO \"$0\"" >> "$c"
             stdint stdio stdlib string tgmath time wchar wctype )
      case "${name:0:3}" in
      c99|C99) for h in ${head[@]}; do echo "#include <${h}.h>" >> "$c"; done ;;
+     c11|C11) for h in ${head[@]}; do echo "#include <${h}.h>" >> "$c"; done ;;
      cxx|CXX) for h in ${head[@]}; do echo "#include <c${h}>"  >> "$c"; done ;;
      esac
 fi
@@ -161,7 +162,7 @@ case "${name:0:3}" in
     "${CC-cc}"   -std=gnu99   -o "$x" "${flags[@]}" -x c   "${logic[@]}" 1>&2
     ;;
   cxx|CXX)
-    "${CXX-c++}" -std=gnu++11 -o "$x" "${flags[@]}" -x c++ "${logic[@]}" 1>&2
+    "${CXX-c++}" -std=gnu++14 -o "$x" "${flags[@]}" -x c++ "${logic[@]}" 1>&2
     ;;
   *)
     fatal $LINENO "error: unrecognized language prefix - ${name:0:3}"
