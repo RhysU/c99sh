@@ -66,14 +66,14 @@ trap 'rm -f "$c" "$x"' EXIT                       # Automatic cleanup on exit
 
 # If requested, include all standard C99 headers in either C or C++ fashion
 if [ $s -gt 0 ]
-then echo "#line $LINENO \"$0\"" >> "$c"
+then echo "#line $LINENO \"$0\"" >>"$c"
      head=( assert complex ctype errno fenv float inttypes iso646
             limits locale math setjmp signal stdarg stdbool stddef
             stdint stdio stdlib string tgmath time wchar wctype )
      case "${name:0:3}" in
-     c99|C99) for h in ${head[@]}; do echo "#include <${h}.h>" >> "$c"; done ;;
-     c11|C11) for h in ${head[@]}; do echo "#include <${h}.h>" >> "$c"; done ;;
-     cxx|CXX) for h in ${head[@]}; do echo "#include <c${h}>"  >> "$c"; done ;;
+     c99|C99) for h in "${head[@]}"; do echo "#include <${h}.h>" >>"$c"; done ;;
+     c11|C11) for h in "${head[@]}"; do echo "#include <${h}.h>" >>"$c"; done ;;
+     cxx|CXX) for h in "${head[@]}"; do echo "#include <c${h}>"  >>"$c"; done ;;
      esac
 fi
 
@@ -86,17 +86,17 @@ declare -a logic=("$c" ${LDFLAGS-})       # Sources, LDFLAGS, LIBS
 process_rcfile() {
   local i=0
   while IFS=$' \t\n' read -r o; do
-    echo "#line $((i+=1)) \"$1\" // $o" >> "$c"  # Record line in munged source
+    echo "#line $((i+=1)) \"$1\" // $o" >>"$c"   # Record line in munged source
     if   [  -z "$o"        ]                     # Skip empty lines
     then :
     elif [[ $o =~ ^#      ]]                     # C preprocessor directives
-    then echo "$o" >> "$c"
+    then echo "$o" >>"$c"
     elif [[ $o =~ ^-[lLR] ]]                     # Linker flags
     then logic+=($o)
     elif [[ $o =~ ^-      ]]                     # Compiler flags
     then flags+=($o)
     elif [[ $o =~ ^using|^namespace ]]           # Namespace directives
-    then echo "$o;" >> "$c"
+    then echo "$o;" >>"$c"
     elif [[ $o =~ ^pkg-config[[:space:]]+ ]]     # Declaration for pkg-config..
     then local p=${o##pkg-config+([[:space:]])}  # ..requires lengthier parsing
          if   [[ $p =~ ^--cflags ]]
@@ -135,22 +135,22 @@ fi
 
 # If requested, open main function about input suppressing unused argc, argv
 if [ $m -gt 0 ]
-then echo "#line $LINENO \"$0\""               >> "$c"
-     echo "int main(int argc, char *argv[]) {" >> "$c"
-     echo "(void) argc; (void) argv;"          >> "$c"
+then echo "#line $LINENO \"$0\""               >>"$c"
+     echo "int main(int argc, char *argv[]) {" >>"$c"
+     echo "(void) argc; (void) argv;"          >>"$c"
 fi
 
 # Prepare source from standard input for "interpretation" by the compiler.
 # Possibly swap shebang on first input line with a preprocessor line pragma so
 #   (a) the source can be compiled without an unknown pragma warning, and
 #   (b) errors and warnings within the file show usable line information
-echo "#line 1 \"$f\""            >> "$c"
-sed "1s|^#!.*\$|#line 2 \"$f\"|" >> "$c"
+echo "#line 1 \"$f\""            >>"$c"
+sed "1s|^#!.*\$|#line 2 \"$f\"|" >>"$c"
 
 # If requested, close main function about input
 if [ $m -gt 0 ]
-then echo "#line $LINENO \"$0\"" >> "$c"
-     echo "} /*main*/"           >> "$c"
+then echo "#line $LINENO \"$0\"" >>"$c"
+     echo "} /*main*/"           >>"$c"
 fi
 
 # Compile and execute with any remaining command line arguments
