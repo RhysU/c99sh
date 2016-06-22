@@ -86,8 +86,9 @@ a hello world C++ example.  One nice use case is hacking atop
 is, `cxxsh -p eigen3 myprogram` builds and runs a one-off, Eigen-based program.
 With the right `cxxshrc`, such a program can be turned into a script.  Though,
 you will likely notice the compilation overhead much moreso with C++ than C99.
-C11 can be used via a symlink named [c11sh](c11sh) with control files like
-`c11shrc`.
+That said, for repeated invocation an output binary can be saved with the `-x`
+option should repeated recompilation be prohibitively expensive.  C11 can be
+used via a symlink named [c11sh](c11sh) with control files like `c11shrc`.
 
 The idea for `c99sh` came from [21st Century
 C](http://shop.oreilly.com/product/0636920025108.do)'s section "Compiling C

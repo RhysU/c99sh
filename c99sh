@@ -28,6 +28,7 @@ Options:
   -r RC   Load compilation settings from RC suppressing normal rcfile search
   -s      Include all standard headers defined by ISO/IEC 9899:1999
   -v      Increase verbosity; may be supplied multiple times
+  -x EXE  Output a successfully compiled executable as EXE instead of running it
 
 An rcfile "${name}rc" controls compilation if present in the same directory as
 PROGRAM, or if present in the current working directory when processing standard
@@ -36,7 +37,7 @@ input.  Otherwise, if it exists, the file ~/.${name}rc controls compilation.
 If compilation is successful, the exit status is that of PROGRAM.
 "
 declare -i m=0 s=0 v=0
-while getopts hmp:r:sv flag; do
+while getopts hmp:r:svx: flag; do
   case $flag in
     h) exec echo -ne "$help"      ;; # Stops processing due to exec
     m) m=1                        ;; # To be processed later
@@ -44,6 +45,7 @@ while getopts hmp:r:sv flag; do
     r) r=$OPTARG                  ;; # Record requested rcfile, last one wins
     s) s=1                        ;; # To be processed later
     v) ((v+=1))                   ;; # Try -v, -vv, etc. to increase verbosity
+    x) X=$OPTARG                  ;; # To be processed later; notice 'X' not 'x'
     ?) exit;                      ;;
   esac
 done
@@ -153,7 +155,7 @@ then echo "#line $LINENO \"$0\"" >>"$c"
      echo "} /*main*/"           >>"$c"
 fi
 
-# Compile and execute with any remaining command line arguments
+# Compile the generated source with appropriate verbosity
 [ $v -ge 2 ] && cat "$c" 1>&2
 [ $v -ge 1 ] && set -x
 case "${name:0:3}" in
@@ -170,4 +172,6 @@ case "${name:0:3}" in
     fatal $LINENO "error: unrecognized language prefix - ${name:0:3}"
     ;;
 esac
-"$x" "$@"
+
+# Either save or execute the binary with any remaining arguments
+[ -n "${X-}" ] && cp "$x" "$X" || "$x" "$@"
