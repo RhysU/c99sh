@@ -1,2 +1,3 @@
 -Wall
 #include <iostream>
+using namespace std

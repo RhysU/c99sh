@@ -95,6 +95,8 @@ process_rcfile() {
     then logic+=($o)
     elif [[ $o =~ ^-      ]]                     # Compiler flags
     then flags+=($o)
+    elif [[ $o =~ ^using|^namespace ]]           # Namespace directives
+    then echo "$o;" >> "$c"
     elif [[ $o =~ ^pkg-config[[:space:]]+ ]]     # Declaration for pkg-config..
     then local p=${o##pkg-config+([[:space:]])}  # ..requires lengthier parsing
          if   [[ $p =~ ^--cflags ]]

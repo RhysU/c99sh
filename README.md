@@ -79,8 +79,9 @@ the [Octave version](gsl/nozzle_match.m) of some simple logic with the
 As nearly the entire C99-oriented implementation works for C++, by invoking
 [c99sh](c99sh) through either a copy or symlink named [cxxsh](cxxsh), you can
 write C++-based logic.  The relevant control files are named like `cxxshrc` in
-this case.  See [cxx/hello](cxx/hello) and [cxx/cxxshrc](cxx/cxxshrc) for a
-hello world C++ example.  One nice use case is hacking atop
+this case and they support directives like `using namespace std` and `namespace
+fb == foo::bar`.  See [cxx/hello](cxx/hello) and [cxx/cxxshrc](cxx/cxxshrc) for
+a hello world C++ example.  One nice use case is hacking atop
 [Eigen](http://eigen.tuxfamily.org/) since it provides pkg-config support. That
 is, `cxxsh -p eigen3 myprogram` builds and runs a one-off, Eigen-based program.
 With the right `cxxshrc`, such a program can be turned into a script.  Though,
