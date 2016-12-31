@@ -1,6 +1,19 @@
 c99sh
 =====
 
+<!-- vim-markdown-toc GFM -->
+* [Basic Idea](#basic-idea)
+* [Control Files](#control-files)
+* [Shebang Tricks](#shebang-tricks)
+* [C++](#c)
+* [C11](#c11)
+* [Credits](#credits)
+
+<!-- vim-markdown-toc -->
+
+Basic Idea
+----------
+
 A shebang-friendly script for "interpreting" single C99, C11, and C++ files,
 including rcfile support.
 
@@ -27,6 +40,9 @@ conjunction with HERE documents can accomplish many things.  For example,
     $ ./c99sh -sm <<HERE
     puts("Hello, world!");
     HERE
+
+Control Files
+-------------
 
 Control files can supply compilation and linking flags, preprocessor directives
 like `#include`, and
@@ -76,6 +92,9 @@ the [Octave version](gsl/nozzle_match.m) of some simple logic with the
 [equivalent c99sh-based version](gsl/nozzle_match) requiring only a few
 [one-time additions](gsl/c99shrc) to your `~/.c99shrc`.
 
+Shebang Tricks
+--------------
+
 Dual shebang/compiled support, that is a source file that can be both
 interpreted via `./shebang.c` and compiled via `gcc shebang.c`, can most
 succinctly be achieved (Thanks [mcandre](http://github.com/mcandre) and
@@ -92,20 +111,33 @@ succinctly be achieved (Thanks [mcandre](http://github.com/mcandre) and
         printf("Hello, world!\n");
     }
 
+C++
+---
+
 As nearly the entire C99-oriented implementation works for C++, by invoking
 [c99sh](c99sh) through either a copy or symlink named [cxxsh](cxxsh), you can
 write C++-based logic.  The relevant control files are named like `cxxshrc` in
 this case and they support directives like `using namespace std` and `namespace
 fb = foo::bar`.  See [cxx/hello](cxx/hello) and [cxx/cxxshrc](cxx/cxxshrc) for a
-hello world C++ example.  One nice use case is hacking atop
-[Eigen](http://eigen.tuxfamily.org/) since it provides pkg-config support. That
-is, `cxxsh -p eigen3 myprogram` builds and runs a one-off, Eigen-based program.
-With the right `cxxshrc`, such a program can be turned into a script.  Though,
-you will likely notice the compilation overhead much moreso with C++ than C99.
-That said, for repeated invocation an output binary can be saved with the `-x`
-option should repeated recompilation be prohibitively expensive.  C11 can be
-used via a symlink named [c11sh](c11sh) with control files like `c11shrc`.  See
-[cxx/shebang.cpp](cxx/shebang.cpp) for a C++ dual shebang/compiled idiom.
+hello world C++ example.  See [cxx/shebang.cpp](cxx/shebang.cpp) for a C++ dual
+shebang/compiled idiom.
+
+One nice use case is hacking atop [Eigen](http://eigen.tuxfamily.org/) since it
+provides pkg-config support. That is, `cxxsh -p eigen3 myprogram` builds and
+runs a one-off, Eigen-based program.  With the right `cxxshrc`, such a program
+can be turned into a script.  Though, you will likely notice the compilation
+overhead much moreso with C++ than C99.  That said, for repeated invocation an
+output binary can be saved with the `-x` option should repeated recompilation be
+prohibitively expensive.
+
+C11
+---
+
+C11 can be used via a symlink named [c11sh](c11sh) with control files like
+`c11shrc`.
+
+Credits
+-------
 
 The idea for `c99sh` came from [21st Century
 C](http://shop.oreilly.com/product/0636920025108.do)'s section "Compiling C
@@ -114,3 +146,8 @@ online](http://cdn.oreilly.com/oreilly/booksamplers/9781449327149_sampler.pdf))
 by [Ben Klemens](http://ben.klemens.org/). Additionally, I wrote it somewhat in
 reaction to browsing the C++-ish work by
 [elsamuko/cppsh](https://github.com/elsamuko/cppsh).
+
+The dual shebang/compiled approach was suggested by
+[mcandre](http://github.com/mcandre) and [jtsagata](http://github.com/jtsagata).
+Thank you both for pushing on the idea, as I did not think it could be done in
+three clean lines.
