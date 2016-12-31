@@ -97,8 +97,7 @@ Shebang Tricks
 
 Dual shebang/compiled support, that is a source file that can be both
 interpreted via `./shebang.c` and compiled via `gcc shebang.c`, can most
-succinctly be achieved (Thanks [mcandre](http://github.com/mcandre) and
-[jtsagata](http://github.com/jtsagata)!) as follows:
+succinctly be achieved as follows:
 
     #if 0
     exec c99sh "$0"
