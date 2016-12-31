@@ -76,19 +76,36 @@ the [Octave version](gsl/nozzle_match.m) of some simple logic with the
 [equivalent c99sh-based version](gsl/nozzle_match) requiring only a few
 [one-time additions](gsl/c99shrc) to your `~/.c99shrc`.
 
+Dual shebang/compiled support, that is a source file that can be both
+interpreted via `./shebang.c` and compiled via `gcc shebang.c`, can most
+succinctly be achieved (Thanks [mcandre](http://github.com/mcandre) and
+[jtsagata](http://github.com/jtsagata)!) as follows:
+
+    #if 0
+    exec c99sh "$0"
+    #endif
+
+    #include <stdio.h>
+
+    int main()
+    {
+        printf("Hello, world!\n");
+    }
+
 As nearly the entire C99-oriented implementation works for C++, by invoking
 [c99sh](c99sh) through either a copy or symlink named [cxxsh](cxxsh), you can
 write C++-based logic.  The relevant control files are named like `cxxshrc` in
 this case and they support directives like `using namespace std` and `namespace
-fb = foo::bar`.  See [cxx/hello](cxx/hello) and [cxx/cxxshrc](cxx/cxxshrc) for
-a hello world C++ example.  One nice use case is hacking atop
+fb = foo::bar`.  See [cxx/hello](cxx/hello) and [cxx/cxxshrc](cxx/cxxshrc) for a
+hello world C++ example.  One nice use case is hacking atop
 [Eigen](http://eigen.tuxfamily.org/) since it provides pkg-config support. That
 is, `cxxsh -p eigen3 myprogram` builds and runs a one-off, Eigen-based program.
 With the right `cxxshrc`, such a program can be turned into a script.  Though,
 you will likely notice the compilation overhead much moreso with C++ than C99.
 That said, for repeated invocation an output binary can be saved with the `-x`
 option should repeated recompilation be prohibitively expensive.  C11 can be
-used via a symlink named [c11sh](c11sh) with control files like `c11shrc`.
+used via a symlink named [c11sh](c11sh) with control files like `c11shrc`.  See
+[cxx/shebang.cpp](cxx/shebang.cpp) for a C++ dual shebang/compiled idiom.
 
 The idea for `c99sh` came from [21st Century
 C](http://shop.oreilly.com/product/0636920025108.do)'s section "Compiling C
