@@ -1,0 +1,5 @@
+#!/bin/bash -eu
+# C inside bash using a here document
+c99sh -sm <<HERE
+printf("Hello, world!\n");
+HERE

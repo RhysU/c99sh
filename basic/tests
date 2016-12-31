@@ -1,0 +1,14 @@
+#!/bin/bash -eux
+# c99sh test driver
+./hello
+
+./heredoc
+
+./shebang.c
+gcc ./shebang.c
+./a.out
+rm a.out
+
+./quicktest.c
+gcc -c ./quicktest.c
+rm ./quicktest.o

@@ -1,0 +1,14 @@
+#!/bin/bash -eux
+# cxxsh test driver
+./hello
+
+./heredoc
+
+./shebang.cpp
+g++ ./shebang.cpp
+./a.out
+rm a.out
+
+./quicktest.cpp
+g++ -c ./quicktest.cpp
+rm ./quicktest.o

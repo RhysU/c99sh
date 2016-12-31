@@ -110,6 +110,28 @@ succinctly be achieved as follows:
         printf("Hello, world!\n");
     }
 
+This dual shebang approach permits quick testing/iteration on valid
+C source files using the `-t` option:
+
+    #if 0
+    exec c99sh -t 'test()' "$0"
+    #endif
+
+    #include <stdio.h>
+
+    int logic()
+    {
+        return 42;
+    }
+
+    static void test()
+    {
+        printf("%d\n", logic());
+    }
+
+Testing in this manner resembles how folks use Python's `__main__` inside
+libraries.
+
 C++
 ---
 
@@ -118,8 +140,8 @@ As nearly the entire C99-oriented implementation works for C++, by invoking
 write C++-based logic.  The relevant control files are named like `cxxshrc` in
 this case and they support directives like `using namespace std` and `namespace
 fb = foo::bar`.  See [cxx/hello](cxx/hello) and [cxx/cxxshrc](cxx/cxxshrc) for a
-hello world C++ example.  See [cxx/shebang.cpp](cxx/shebang.cpp) for a C++ dual
-shebang/compiled idiom.
+hello world C++ example.  See [cxx/shebang.cpp](cxx/shebang.cpp) and
+[cxx/quicktest.cpp](cxx/quicktest.cpp) for C++ dual shebang/compiled idioms.
 
 One nice use case is hacking atop [Eigen](http://eigen.tuxfamily.org/) since it
 provides pkg-config support. That is, `cxxsh -p eigen3 myprogram` builds and
@@ -147,6 +169,6 @@ reaction to browsing the C++-ish work by
 [elsamuko/cppsh](https://github.com/elsamuko/cppsh).
 
 The dual shebang/compiled approach was suggested by
-[mcandre](http://github.com/mcandre) and [jtsagata](http://github.com/jtsagata).
-Thank you both for pushing on the idea, as I did not think it could be done in
-three clean lines.
+[mcandre](http://github.com/mcandre) and
+[jtsagata](http://github.com/jtsagata).  Thank you both for pushing on the
+idea, as I did not think it could be done in three clean lines.

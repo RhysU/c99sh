@@ -22,13 +22,14 @@ Usage: ${name} [OPTION]... [--] PROGRAM [PROGRAMOPTION]...
 Compile ${name:0:3} PROGRAM, or standard input, and run it supplying [PROGRAMOPTION]...
 
 Options:
-  -h      Display this help message
-  -m      Wrap input in canonical main declaration exposing argc, argv
-  -p PKG  Make PKG headers and libraries available to PROGRAM via pkg-config(1)
-  -r RC   Load compilation settings from RC suppressing normal rcfile search
-  -s      Include all standard headers defined by ISO/IEC 9899:1999
-  -v      Increase verbosity; may be supplied multiple times
-  -x EXE  Output a successfully compiled executable as EXE instead of running it
+  -h       Display this help message
+  -m       Wrap input in canonical main(argc, argv) declaration
+  -p PKG   Make PKG headers and libraries available to PROGRAM via pkg-config(1)
+  -r RC    Load compilation settings from RC suppressing normal rcfile search
+  -s       Include all standard headers defined by ISO/IEC 9899:1999
+  -t STMT  Append a main(argc, argv) implementation running statement STMT
+  -v       Increase verbosity; may be supplied multiple times
+  -x EXE   Save a successfully compiled executable as EXE instead of running it
 
 An rcfile "${name}rc" controls compilation if present in the same directory as
 PROGRAM, or if present in the current working directory when processing standard
@@ -37,13 +38,14 @@ input.  Otherwise, if it exists, the file ~/.${name}rc controls compilation.
 If compilation is successful, the exit status is that of PROGRAM.
 "
 declare -i m=0 s=0 v=0
-while getopts hmp:r:svx: flag; do
+while getopts hmp:r:st:vx: flag; do
   case $flag in
     h) exec echo -ne "$help"      ;; # Stops processing due to exec
     m) m=1                        ;; # To be processed later
     p) pkg[$OPTARG]="flag -$flag" ;; # Additively record requested package
     r) r=$OPTARG                  ;; # Record requested rcfile, last one wins
     s) s=1                        ;; # To be processed later
+    t) T=$OPTARG;                 ;; # To be processed later; notice 'T' not 't'
     v) ((v+=1))                   ;; # Try -v, -vv, etc. to increase verbosity
     x) X=$OPTARG                  ;; # To be processed later; notice 'X' not 'x'
     ?) exit;                      ;;
@@ -135,12 +137,19 @@ then flags+=($(pkg-config --cflags ${!pkg[@]})) || (echo 1>&2; stderr_pkgs; \
         fatal $LINENO "error: failure obtaining --libs from pkg-config")
 fi
 
-# If requested, open main function about input suppressing unused argc, argv
-if [ $m -gt 0 ]
-then echo "#line $LINENO \"$0\""               >>"$c"
-     echo "int main(int argc, char *argv[]) {" >>"$c"
-     echo "(void) argc; (void) argv;"          >>"$c"
-fi
+# Helpers to emit a main declaration silencing unused argc, argv warnings
+emit_main_open() {
+    echo "#line $LINENO \"$0\""               >>"$c"
+    echo "int main(int argc, char *argv[]) {" >>"$c"
+    echo "(void) argc; (void) argv;"          >>"$c"
+}
+emit_main_close() {
+    echo "#line $LINENO \"$0\"" >>"$c"
+    echo "} /*main*/"           >>"$c"
+}
+
+# If requested, open main function about entire input
+[ $m -gt 0 ] && emit_main_open
 
 # Prepare source from standard input for "interpretation" by the compiler.
 # Possibly swap shebang on first input line with a preprocessor line pragma so
@@ -149,10 +158,14 @@ fi
 echo "#line 1 \"$f\""            >>"$c"
 sed "1s|^#!.*\$|#line 2 \"$f\"|" >>"$c"
 
-# If requested, close main function about input
-if [ $m -gt 0 ]
-then echo "#line $LINENO \"$0\"" >>"$c"
-     echo "} /*main*/"           >>"$c"
+# If requested, close main function about entire input
+[ $m -gt 0 ] && emit_main_close
+
+# If requested, append a main function containing the given statement
+if [ -n "${T-}" ]
+then emit_main_open
+     echo "$T;" >> "$c"
+     emit_main_close
 fi
 
 # Compile the generated source with appropriate verbosity

@@ -1,4 +1,5 @@
 #!/usr/bin/env c99sh
+// Executable C script using a shebang
 int main()
 {
     printf("Hello, world!\n");
