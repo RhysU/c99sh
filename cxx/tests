@@ -11,7 +11,7 @@ g++ ./shebang.cpp
 ./a.out
 rm a.out
 
-cxxsh -vv -x a.out shebang.cpp
+../cxxsh -vv -x a.out shebang.cpp
 ./a.out
 rm a.out
 
