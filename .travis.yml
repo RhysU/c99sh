@@ -3,4 +3,4 @@ script: ./tests
 addons:
     apt:
         packages:
-            - libgsl-dev
+            - libgsl0-dev
