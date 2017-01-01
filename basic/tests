@@ -1,11 +1,17 @@
 #!/bin/bash -eux
-# c99sh test driver
+# c99sh test driver relying upon c99shrc in the same directory
+cd "${0%/*}"
+
 ./hello
 
 ./heredoc
 
 ./shebang.c
 gcc ./shebang.c
+./a.out
+rm a.out
+
+c99sh -vv -x a.out shebang.c
 ./a.out
 rm a.out
 

@@ -1,0 +1,3 @@
+#!/bin/bash -eux
+# c99sh top-level driver for all tests
+find . -mindepth 2 -name tests -executable -exec {} \;
