@@ -1,5 +1,5 @@
-#!/usr/bin/env c99sh
-// Executable C script using a shebang
+#!../c99sh
+// Executable C script using a shebang (in scripts use #!/usr/bin/env c99sh).
 int main()
 {
     printf("Hello, world!\n");

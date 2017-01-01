@@ -1,33 +1,33 @@
-#!/usr/bin/env c99sh
+#!../c99sh -m
+
+// Simple positional argument parsing with defaults
+double delta = argc > 1 ? atof(argv[1]) :  1        ;
+double gam0  = argc > 2 ? atof(argv[2]) :  1.4087   ;
+double Ma_e  = argc > 3 ? atof(argv[3]) :  1.1906   ;
+double p_exi = argc > 4 ? atof(argv[4]) : -0.025439 ;
+double T_e   = argc > 5 ? atof(argv[5]) :  4.0040   ;
+
 // Produce a flow matching the given boundary layer edge conditions.
 // If supplied, T_e specifies an edge temperature for the ideal gas EOS.
-int main(int argc, char *argv[])
-{
-    double delta = argc > 1 ? atof(argv[1]) :  1        ;
-    double gam0  = argc > 2 ? atof(argv[2]) :  1.4087   ;
-    double Ma_e  = argc > 3 ? atof(argv[3]) :  1.1906   ;
-    double p_exi = argc > 4 ? atof(argv[4]) : -0.025439 ;
-    double T_e   = argc > 5 ? atof(argv[5]) :  4.0040   ;
+double Ma_e2  = gsl_pow_2(Ma_e );
+double delta2 = gsl_pow_2(delta);
+double x[2];
+int nreal   = gsl_poly_solve_quadratic(
+                  - fabs(Ma_e2 - 1) * fabs(p_exi),
+                  delta,
+                  - Ma_e2 * delta2 * fabs(p_exi) * GSL_SIGN(Ma_e2 - 1),
+                  x+0, x+1);
+double R0   = nreal ? x[nreal - 1] : GSL_NAN;
+double Ma0  = 1 / sqrt(1/Ma_e2 + (gam0 - 1)*delta2/gsl_pow_2(R0)/2);
+double R    = sqrt(gsl_pow_2(R0) + delta2);
+double u1   = - R / R0 * GSL_SIGN(p_exi*(Ma_e2 - 1));
+double rho1 = 1;
+double p1   = T_e == 0 ? 1 : T_e*gsl_pow_2(Ma0)*rho1/gam0/Ma_e2;
 
-    double Ma_e2  = gsl_pow_2(Ma_e );
-    double delta2 = gsl_pow_2(delta);
-    double x[2];
-    int nreal   = gsl_poly_solve_quadratic(
-                      - fabs(Ma_e2 - 1) * fabs(p_exi),
-                      delta,
-                      - Ma_e2 * delta2 * fabs(p_exi) * GSL_SIGN(Ma_e2 - 1),
-                      x+0, x+1);
-    double R0   = nreal ? x[nreal - 1] : GSL_NAN;
-    double Ma0  = 1 / sqrt(1/Ma_e2 + (gam0 - 1)*delta2/gsl_pow_2(R0)/2);
-    double R    = sqrt(gsl_pow_2(R0) + delta2);
-    double u1   = - R / R0 * GSL_SIGN(p_exi*(Ma_e2 - 1));
-    double rho1 = 1;
-    double p1   = T_e == 0 ? 1 : T_e*gsl_pow_2(Ma0)*rho1/gam0/Ma_e2;
-
-    printf("R0:   %g\n",  R0  );
-    printf("Ma0:  %g\n",  Ma0 );
-    printf("R:    %g\n",  R   );
-    printf("u1:   %g\n",  u1  );
-    printf("rho1: %g\n",  rho1);
-    printf("p1:   %g\n",  p1  );
-}
+// Display results
+printf("R0:   %g\n",  R0  );
+printf("Ma0:  %g\n",  Ma0 );
+printf("R:    %g\n",  R   );
+printf("u1:   %g\n",  u1  );
+printf("rho1: %g\n",  rho1);
+printf("p1:   %g\n",  p1  );

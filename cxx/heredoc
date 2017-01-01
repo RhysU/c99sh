@@ -1,5 +1,5 @@
 #!/bin/bash -eu
-# C++ inside bash using a here document
-cxxsh -sm <<HERE
+# C++ inside bash using a here document (in scripts skip the ../ prefix).
+../cxxsh -sm <<HERE
 cout << "Hello, world!" << endl;
 HERE

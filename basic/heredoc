@@ -1,5 +1,8 @@
 #!/bin/bash -eu
-# C inside bash using a here document
-c99sh -sm <<HERE
+# C11 inside bash using a here document (in scripts skip the ../ prefix).
+../c11sh -sm <<HERE
+#if __STDC_VERSION__ != 201112L
+#error C11 not detected
+#endif
 printf("Hello, world!\n");
 HERE

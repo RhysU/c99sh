@@ -1,5 +1,5 @@
-#!/usr/bin/env cxxsh
-// Executable C++ script using a shebang
+#!../cxxsh
+// Executable C++ script using a shebang (in scripts use #!/usr/bin/env cxxsh).
 int main()
 {
     cout << "Hello, world!" << endl;
