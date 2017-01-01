@@ -1,6 +1,14 @@
-language: cpp
+language: generic
 script: ./tests
-addons:
-    apt:
-        packages:
+matrix:
+  include:
+    - os: linux
+      env: COMPILER_NAME=gcc CXX=g++-5 CC=gcc-5
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
             - libgsl0-dev
+            - autotools-dev
+            - g++-5
