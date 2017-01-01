@@ -15,7 +15,8 @@ Basic Idea
 ----------
 
 A shebang-friendly script for "interpreting" single C99, C11, and C++ files,
-including rcfile support.
+including rcfile support.  [![Build
+Status](https://travis-ci.org/RhysU/c99sh.svg?branch=master)](https://travis-ci.org/RhysU/c99sh)
 
 For example, installing this `~/.c99shrc` control file
 
