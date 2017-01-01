@@ -11,7 +11,7 @@ gcc ./shebang.c
 ./a.out
 rm a.out
 
-c99sh -vv -x a.out shebang.c
+../c99sh -vv -x a.out shebang.c
 ./a.out
 rm a.out
 
