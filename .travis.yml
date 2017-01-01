@@ -1,0 +1,6 @@
+language: cpp
+script: ./tests
+addons:
+    apt:
+        packages:
+            - libgsl-dev
