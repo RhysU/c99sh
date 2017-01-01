@@ -2,4 +2,4 @@
 # c99sh test driver relying upon c99shrc in the same directory
 cd "${0%/*}"
 
-./pi
+/usr/bin/time -v ./pi
