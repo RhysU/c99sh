@@ -1,0 +1,4 @@
+#!/bin/bash -eu
+# C11 inside bash using a here document (in scripts skip the ../ prefix).
+../c11sh -ms 'printf("Hello from 1-line\n");'
+../c11sh -s 'printf("Hello from 1-line\n");'
