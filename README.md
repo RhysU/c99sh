@@ -42,6 +42,17 @@ conjunction with HERE documents can accomplish many things.  For example,
     puts("Hello, world!");
     HERE
 
+One Line Statements
+-------------------
+
+To run a one line statement, append a 1 (one) to the arg list along with m and
+use like:
+
+c99sh -ms1 'printf("hi, there\n");'
+
+Note that single quotes around the statement makes echo command to use the
+string in it as is, which helps.
+
 Control Files
 -------------
 

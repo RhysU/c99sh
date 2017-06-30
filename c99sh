@@ -30,6 +30,7 @@ Options:
   -t STMT  Append a main(argc, argv) implementation running statement STMT
   -v       Increase verbosity; may be supplied multiple times
   -x EXE   Save a successfully compiled executable as EXE instead of running it
+  -1	   1-line, put the line in main (provide -m as well) and run instead of providing a file/script
 
 An rcfile "${name}rc" controls compilation if present in the same directory as
 PROGRAM, or if present in the current working directory when processing standard
@@ -37,8 +38,8 @@ input.  Otherwise, if it exists, the file ~/.${name}rc controls compilation.
 
 If compilation is successful, the exit status is that of PROGRAM.
 "
-declare -i m=0 s=0 v=0
-while getopts hmp:r:st:vx: flag; do
+declare -i m=0 s=0 v=0 oneline=0
+while getopts hmp1:r:st:vx: flag; do
   case $flag in
     h) exec echo -ne "$help"      ;; # Stops processing due to exec
     m) m=1                        ;; # To be processed later
@@ -48,10 +49,13 @@ while getopts hmp:r:st:vx: flag; do
     t) T=$OPTARG;                 ;; # To be processed later; notice 'T' not 't'
     v) ((v+=1))                   ;; # Try -v, -vv, etc. to increase verbosity
     x) X=$OPTARG                  ;; # To be processed later; notice 'X' not 'x'
+    1) oneline=1		  ;; # To be processed while putting the code in
     ?) exit;                      ;;
   esac
 done
-shift $((OPTIND-1))
+shift $((OPTIND-2))
+statement=$1
+shift 1
 
 # Process standard input on absent or '-' filename otherwise snarf $1
 f="<stdin>"; d="."
@@ -156,7 +160,11 @@ emit_main_close() {
 #   (a) the source can be compiled without an unknown pragma warning, and
 #   (b) errors and warnings within the file show usable line information
 echo "#line 1 \"$f\""            >>"$c"
-sed "1s|^#!.*\$|#line 2 \"$f\"|" >>"$c"
+if [ $oneline -eq 1 ]; then
+	echo $statement >> "$c"
+else
+	sed "1s|^#!.*\$|#line 2 \"$f\"|" >>"$c"	
+fi
 
 # If requested, close main function about entire input
 [ $m -gt 0 ] && emit_main_close
