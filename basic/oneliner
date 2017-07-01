@@ -36,3 +36,6 @@ HERE
 
 # an example of escaping single-quotes on shell line:
 ../c99sh -e 'printf("'"'"'Hello ");' -e 'printf("World'"'"' ");' -e 'printf("from 1-liner\n");'
+
+# an example of escaping double-quotes
+../c99sh -e 'printf("\"Hello ");' -e 'printf("World\" ");' -e 'printf("from 1-liner\n");'
