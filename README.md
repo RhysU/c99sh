@@ -42,15 +42,39 @@ conjunction with HERE documents can accomplish many things.  For example,
     puts("Hello, world!");
     HERE
 
-One Line Statements
--------------------
-
 To run a one line statement:
 
-c99sh -s 'printf("hi, there\n");'
+    c99sh -e 'printf("hi, there\n");'
+
+-e switch assumes -s is passed as well, so it uses all headers.
 
 Note that single quotes around the statement makes echo command to use the
 string in it as is, which helps.
+
+-e switch is similar to perl's -e, so you can accumulate multiple -e statements:
+
+    ../c99sh -e 'printf("Hello ");' -e 'printf("World ");' -e 'printf("from 1-liner\n");'
+
+Needless to say, the above line can also be run with one -e switch version:
+
+    ../c99sh -e 'printf("Hello "); printf("World "); printf("from 1-liner\n");'
+
+And you can have one line statement and HERE documents together:
+
+    ../c99sh -e 'int start = 3;' -sm <<HERE
+    if (start == 3)
+        printf("Hello from 1-liner\n");
+    else
+        return 1;
+    return 0;
+    HERE
+
+When running one line commands, a single quote cannot be escaped easily in the shell,
+that's why you should use the escape sequence: '"'"' for one single-quote:
+
+    ../c99sh -e 'printf("'"'"'Hello ");' -e 'printf("World'"'"'\n");'
+
+Which outputs: 'Hello World'
 
 Control Files
 -------------
@@ -183,3 +207,7 @@ The dual shebang/compiled approach was suggested by
 [mcandre](http://github.com/mcandre) and
 [jtsagata](http://github.com/jtsagata).  Thank you both for pushing on the
 idea, as I did not think it could be done in three clean lines.
+
+The one line execution similar to Perl's -e is done by
+[mattapiroglu](http://github.com/mattapiroglu).
+
