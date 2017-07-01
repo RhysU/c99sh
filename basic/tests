@@ -4,6 +4,8 @@ cd "${0%/*}"
 
 ./hello
 
+./oneliner
+
 ./heredoc
 
 ./shebang.c
