@@ -30,7 +30,7 @@ Options:
   -t STMT  Append a main(argc, argv) implementation running statement STMT
   -v       Increase verbosity; may be supplied multiple times
   -x EXE   Save a successfully compiled executable as EXE instead of running it
-  -1	   1-line, put the line in main (provide -m as well) and run instead of providing a file/script
+  -e STMT ( -e STMT2 ...) Run statements wrapping them in main, also using -s implicitly if not given
 
 An rcfile "${name}rc" controls compilation if present in the same directory as
 PROGRAM, or if present in the current working directory when processing standard
@@ -38,8 +38,9 @@ input.  Otherwise, if it exists, the file ~/.${name}rc controls compilation.
 
 If compilation is successful, the exit status is that of PROGRAM.
 "
-declare -i m=0 s=0 v=0 oneline=0
-while getopts hmp:r:st:vx: flag; do
+declare -i m=0 s=0 v=0 oneline=0 stmtcnt=0
+declare -A stmts=()
+while getopts hmp:e:r:st:vx: flag; do
   case $flag in
     h) exec echo -ne "$help"      ;; # Stops processing due to exec
     m) m=1                        ;; # To be processed later
@@ -49,6 +50,9 @@ while getopts hmp:r:st:vx: flag; do
     t) T=$OPTARG;                 ;; # To be processed later; notice 'T' not 't'
     v) ((v+=1))                   ;; # Try -v, -vv, etc. to increase verbosity
     x) X=$OPTARG                  ;; # To be processed later; notice 'X' not 'x'
+    e) oneline=1 s=1
+       stmts[$stmtcnt]=$OPTARG
+       stmtcnt=$(($stmtcnt+1))    ;; # Use 1-line statement, wrapping it in main, assume -s given
     ?) exit;                      ;;
   esac
 done
@@ -58,15 +62,9 @@ shift $((OPTIND-1))
 f="<stdin>"; d="."
 if   [ $# -gt 0 ]
 then if   [ "$1" != "-" ]
-     then
-		 if [ -a "$1" ]; then # if a file is given, then run it with c99sh
-			 f="$1"
-			 d=$(dirname "$1")
-			 exec 0< "$1"
-		 else	# else assume it's a one-line statement
-			 statement=$1
-			 oneline=1
-		 fi
+     then f="$1"
+		  d=$(dirname "$1")
+		  exec 0< "$1"
      fi
      shift 1
 fi
@@ -156,23 +154,26 @@ emit_main_close() {
 }
 
 # If requested, open main function about entire input
-[ $m -gt 0 ] && emit_main_open
+[[ $m -gt 0 || $oneline -eq 1 ]] && emit_main_open
 
 # Prepare source from standard input for "interpretation" by the compiler.
 # Possibly swap shebang on first input line with a preprocessor line pragma so
 #   (a) the source can be compiled without an unknown pragma warning, and
 #   (b) errors and warnings within the file show usable line information
 echo "#line 1 \"$f\""            >>"$c"
-if [ $oneline -eq 1 ]; then
-	[ $m -eq 0 ] && emit_main_open
-	echo $statement >> "$c"
-	[ $m -eq 0 ] && emit_main_close
-else
-	sed "1s|^#!.*\$|#line 2 \"$f\"|" >>"$c"	
+if [ $oneline -eq 1 ]
+then
+	echo ${stmts[@]} >> "$c"
 fi
 
+if [[ ($oneline -eq 1 && $m -gt 0) || $oneline -eq 0 ]]
+then
+	sed "1s|^#!.*\$|#line 2 \"$f\"|" >>"$c"
+fi
+
+
 # If requested, close main function about entire input
-[ $m -gt 0 ] && emit_main_close
+[[ $m -gt 0 || $oneline -eq 1 ]] && emit_main_close
 
 # If requested, append a main function containing the given statement
 if [ -n "${T-}" ]

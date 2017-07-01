@@ -1,4 +1,38 @@
 #!/bin/bash -eu
-# C11 inside bash using a here document (in scripts skip the ../ prefix).
-../c11sh -ms 'printf("Hello from 1-line\n");'
-../c11sh -s 'printf("Hello from 1-line\n");'
+# C99 inside bash using a here document (in scripts skip the ../ prefix).
+../c99sh -se 'printf("Hello from 1-liner\n");'
+../c99sh -s -e 'printf("Hello from 1-liner\n");'
+../c99sh -e 'printf("Hello from 1-liner\n");'
+
+../c99sh -sm -e 'int start = 3;' <<HERE
+if (start == 3)
+    printf("Hello from 1-liner\n");
+else
+    return 1;
+return 0;
+HERE
+
+../c99sh -s -m -e 'int start = 3;' <<HERE
+if (start == 3)
+    printf("Hello from 1-liner\n");
+else
+    return 1;
+return 0;
+HERE
+
+../c99sh -e 'int start = 3;' -sm <<HERE
+if (start == 3)
+    printf("Hello from 1-liner\n");
+else
+    return 1;
+return 0;
+HERE
+
+../c99sh -e 'printf("Hello ");' -e 'printf("World ");' -e 'printf("from 1-liner\n");'
+../c99sh -e 'int i = 3; int retval = 1;' -e 'if (i == 3) {printf("Hello from 1-liner\t"); retval = 0;} else printf("fail\n");' -e 'printf("end of 1-liner\n"); return retval;'
+
+# check \t escape handling
+../c99sh -e 'printf("Hello ");' -e 'printf("World,with tab:\t");' -e 'printf("from 1-liner\n");'
+
+# an example of escaping single-quotes on shell line:
+../c99sh -e 'printf("'"'"'Hello ");' -e 'printf("World'"'"' ");' -e 'printf("from 1-liner\n");'
