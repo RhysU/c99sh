@@ -163,7 +163,9 @@ emit_main_close() {
 echo "#line 1 \"$f\""            >>"$c"
 if [ $oneline -eq 1 ]
 then
-	echo ${stmts[@]} >> "$c"
+	for ((i = 0; i < $stmtcnt; ++i)); do
+		echo ${stmts[$i]} >> "$c"
+	done
 fi
 
 if [[ ($oneline -eq 1 && $m -gt 0) || $oneline -eq 0 ]]
