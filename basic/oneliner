@@ -39,3 +39,5 @@ HERE
 
 # an example of escaping double-quotes
 ../c99sh -e 'printf("\"Hello ");' -e 'printf("World\" ");' -e 'printf("from 1-liner\n");'
+
+../c99sh -e '#define w1 "Hello"' -e '#define w2 "World"' -e 'printf("%s %s\n", w1, w2);'
