@@ -42,39 +42,21 @@ conjunction with HERE documents can accomplish many things.  For example,
     puts("Hello, world!");
     HERE
 
-To run a one line statement:
+One or more lines can be included using `-e`:
 
-    c99sh -e 'printf("hi, there\n");'
+    $ ./c99sh -e 'int main()' -e '{}'
 
--e switch assumes -s is passed as well, so it uses all headers.
+Usually, `-sm` appears alongside `-e`:
 
-Note that single quotes around the statement makes echo command to use the
-string in it as is, which helps.
-
--e switch is similar to perl's -e, so you can accumulate multiple -e statements:
-
-    ../c99sh -e 'printf("Hello ");' -e 'printf("World ");' -e 'printf("from 1-liner\n");'
-
-Needless to say, the above line can also be run with one -e switch version:
-
-    ../c99sh -e 'printf("Hello "); printf("World "); printf("from 1-liner\n");'
-
-And you can have one line statement and HERE documents together:
-
-    ../c99sh -e 'int start = 3;' -sm <<HERE
-    if (start == 3)
+    $ ../c99sh -e 'int start = 3;' -sm <<HERE
+    if (start == 3) {
         printf("Hello from 1-liner\n");
-    else
+    } else {
         return 1;
-    return 0;
+    }
     HERE
 
-When running one line commands, a single quote cannot be escaped easily in the shell,
-that's why you should use the escape sequence: '"'"' for one single-quote:
-
-    ../c99sh -e 'printf("'"'"'Hello ");' -e 'printf("World'"'"'\n");'
-
-Which outputs: 'Hello World'
+Beware quote escaping for `-e` could use some `printf` love.  Patches welcome.
 
 Control Files
 -------------

@@ -1,43 +1,41 @@
 #!/bin/bash -eu
-# C99 inside bash using a here document (in scripts skip the ../ prefix).
-../c99sh -se 'printf("Hello from 1-liner\n");'
-../c99sh -s -e 'printf("Hello from 1-liner\n");'
-../c99sh -e 'printf("Hello from 1-liner\n");'
 
-../c99sh -sm -e 'int start = 3;' <<HERE
-if (start == 3)
-    printf("Hello from 1-liner\n");
-else
-    return 1;
-return 0;
+# Flag -e does not imply wrapping with main but does imply consuming some input
+../c99sh -e 'int main() {}' </dev/null
+../c99sh -se 'int main() {}' </dev/null
+
+# Multiple -e should all be emitted
+../c99sh -e 'int main()' -e '{}' </dev/null
+
+# Subsequent tests only work when the -m and -s options behave as expected
+../c99sh -m </dev/null
+../c99sh -ms </dev/null
+
+../c99sh -mse 'printf("Hello from 1-liner\n");' </dev/null
+
+../c99sh -mse 'int start = 3;' <<HERE
+return start == 3 ? 0 : 1;
 HERE
 
-../c99sh -s -m -e 'int start = 3;' <<HERE
-if (start == 3)
-    printf("Hello from 1-liner\n");
-else
-    return 1;
-return 0;
+../c99sh -ms -e 'int start = 0;' -e 'start += 3;' <<HERE
+return start == 3 ? 0 : 1;
 HERE
-
-../c99sh -e 'int start = 3;' -sm <<HERE
-if (start == 3)
-    printf("Hello from 1-liner\n");
-else
-    return 1;
-return 0;
-HERE
-
-../c99sh -e 'printf("Hello ");' -e 'printf("World ");' -e 'printf("from 1-liner\n");'
-../c99sh -e 'int i = 3; int retval = 1;' -e 'if (i == 3) {printf("Hello from 1-liner\t"); retval = 0;} else printf("fail\n");' -e 'printf("end of 1-liner\n"); return retval;'
 
 # check \t escape handling
-../c99sh -e 'printf("Hello ");' -e 'printf("World,with tab:\t");' -e 'printf("from 1-liner\n");'
+../c99sh -ms -e 'printf("Hello ");' \
+             -e 'printf("World,with tab:\t");' \
+             -e 'printf("from 1-liner\n");' </dev/null
 
 # an example of escaping single-quotes on shell line:
-../c99sh -e 'printf("'"'"'Hello ");' -e 'printf("World'"'"' ");' -e 'printf("from 1-liner\n");'
+../c99sh -ms -e 'printf("'"'"'Hello ");' \
+             -e 'printf("World'"'"' ");' \
+             -e 'printf("from 1-liner\n");' </dev/null
 
 # an example of escaping double-quotes
-../c99sh -e 'printf("\"Hello ");' -e 'printf("World\" ");' -e 'printf("from 1-liner\n");'
+../c99sh -ms -e 'printf("\"Hello ");' \
+             -e 'printf("World\" ");' \
+             -e 'printf("from 1-liner\n");' </dev/null
 
-../c99sh -e '#define w1 "Hello"' -e '#define w2 "World"' -e 'printf("%s %s\n", w1, w2);'
+../c99sh -ms -e '#define w1 "Hello"' \
+             -e '#define w2 "World"' \
+             -e 'printf("%s %s\n", w1, w2);' </dev/null
