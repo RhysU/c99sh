@@ -195,3 +195,5 @@ idea, as I did not think it could be done in three clean lines.
 The one line execution similar to Perl's -e is done by
 [mattapiroglu](http://github.com/mattapiroglu).
 
+The `-l` command line option was contributed by
+[flipcoder](https://github.com/flipcoder).
