@@ -31,6 +31,7 @@ Options:
   -t STMT  Append a main(argc, argv) implementation running statement STMT
   -v       Increase verbosity; may be supplied multiple times
   -x EXE   Save a successfully compiled executable as EXE instead of running it
+  -l LIB   Link to a library
 
 An rcfile "${name}rc" controls compilation if present in the same directory as
 PROGRAM, or if present in the current working directory when processing standard
@@ -38,9 +39,9 @@ input.  Otherwise, if it exists, the file ~/.${name}rc controls compilation.
 
 If compilation is successful, the exit status is that of PROGRAM.
 "
-declare -i e=0 m=0 s=0 v=0
-declare -A E=()
-while getopts e:hmp:r:st:vx: flag; do
+declare -i e=0 m=0 s=0 v=0 l=0
+declare -A E=() L=()
+while getopts e:hmp:r:st:vx:l: flag; do
   case $flag in
     e) E[$e]=$OPTARG; ((e+=1))    ;; # To be processed later; notice 'E' not 'e'
     h) exec echo -ne "$help"      ;; # Stops processing due to exec
@@ -51,6 +52,7 @@ while getopts e:hmp:r:st:vx: flag; do
     t) T=$OPTARG;                 ;; # To be processed later; notice 'T' not 't'
     v) ((v+=1))                   ;; # Try -v, -vv, etc. to increase verbosity
     x) X=$OPTARG                  ;; # To be processed later; notice 'X' not 'x'
+    l) L[$l]=$OPTARG; ((l+=1))    ;; # Libraries to be processed later
     ?) exit;                      ;;
   esac
 done
@@ -178,6 +180,11 @@ then emit_main_open
      echo "$T;" >> "$c"
      emit_main_close
 fi
+
+# Add libraries from command line options
+for ((i = 0; i < $l; ++i)); do
+     logic+=("-l${L[$i]}")
+done
 
 # Compile the generated source with appropriate verbosity
 [ $v -ge 2 ] && cat "$c" 1>&2
