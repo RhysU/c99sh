@@ -69,8 +69,8 @@ interpreted source will be used. Otherwise a `~/.c99shrc` is processed if
 available. See [c99shrc.example](c99shrc.example) for an extended control file
 enabling [GSL](http://www.gnu.org/software/gsl/),
 [GLib](https://developer.gnome.org/glib/), and [SQLite](http://www.sqlite.org/)
-capabilities.  This permits quickly getting access to higher-level data
-structures.
+capabilities.  Control files ease accessing libraries with higher-level
+data structures.
 
 A more entertaining example is an [OpenMP](http://openmp.org/wp/)-enabled Monte
 Carlo computation of π screaming like a banshee on all your cores

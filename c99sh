@@ -101,6 +101,8 @@ process_rcfile() {
     echo "#line $((i+=1)) \"$1\" // $o" >>"$c"   # Record line in munged source
     if   [  -z "$o"        ]                     # Skip empty lines
     then :
+    elif [[ $o =~ ^//     ]]                     # Single line comments: //
+    then echo "$o" >>"$c"
     elif [[ $o =~ ^#      ]]                     # C preprocessor directives
     then echo "$o" >>"$c"
     elif [[ $o =~ ^-[lLR] ]]                     # Linker flags

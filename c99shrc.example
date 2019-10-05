@@ -1,7 +1,9 @@
+// Compilation flags
 -Wall
 -Wextra
 -g -O2
 
+// Headers to include
 #include <alloca.h>
 #include <assert.h>
 #include <ctype.h>
@@ -19,6 +21,7 @@
 #include <tgmath.h>
 #include <time.h>
 
+// Add OpenMP support
 -fopenmp
 #ifdef _OPENMP
 # include <omp.h>
@@ -26,6 +29,7 @@
 # define omp_get_thread_num() 0
 #endif
 
+// GNU Scientific Library linked via pkg-config
 #include <gsl/gsl_cdf.h>
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_linalg.h>
@@ -38,10 +42,13 @@
 #include <gsl/gsl_vector.h>
 pkg-config gsl
 
+// Add glib
 #include <glib.h>
 pkg-config glib-2.0
 
+// Add SQLite3
 #include <sqlite3.h>
 pkg-config sqlite3
 
+// Just in case!
 -lm
