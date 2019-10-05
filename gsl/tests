@@ -2,4 +2,6 @@
 # c99sh test driver relying upon c99shrc in the same directory
 cd "${0%/*}"
 
+./gsl_example
+
 /usr/bin/time -v ./nozzle_match
