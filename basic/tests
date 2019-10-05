@@ -8,9 +8,17 @@ cd "${0%/*}"
 
 ./heredoc
 
-./shebang.c
+
+# Build
+rm -f ./a.out
 gcc ./shebang.c
+# No arguments
 ./a.out
+./shebang.c
+# Some arguments
+./a.out Foo Bar
+./shebang.c Foo Bar
+# Cleanup
 rm a.out
 
 ../c99sh -vv -x a.out shebang.c

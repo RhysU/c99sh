@@ -117,21 +117,23 @@ interpreted via `./shebang.c` and compiled via `gcc shebang.c`, can most
 succinctly be achieved as follows:
 
     #if 0
-    exec c99sh "$0"
+    exec c99sh "$0" "$@"
     #endif
 
     #include <stdio.h>
 
-    int main()
+    int main(int argc, char *argv[])
     {
-        printf("Hello, world!\n");
+        for (int i = 1; i < argc; ++i) {
+            printf("Hello, %s!\n", argv[i]);
+        }
     }
 
 This dual shebang approach permits quick testing/iteration on valid
 C source files using the `-t` option:
 
     #if 0
-    exec c99sh -t 'test()' "$0"
+    exec c99sh -t 'test()' "$0" "$@"
     #endif
 
     #include <stdio.h>
