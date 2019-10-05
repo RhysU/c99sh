@@ -24,6 +24,7 @@ Compile ${name:0:3} PROGRAM, or standard input, and run it supplying [PROGRAMOPT
 Options:
   -e LINE  Prepends LINE to any input; often used in conjunction with -ms
   -h       Display this help message
+  -l LIB   Link to the library LIB
   -m       Wrap input in canonical main(argc, argv) declaration
   -p PKG   Make PKG headers and libraries available to PROGRAM via pkg-config(1)
   -r RC    Load compilation settings from RC suppressing normal rcfile search
@@ -31,7 +32,6 @@ Options:
   -t STMT  Append a main(argc, argv) implementation running statement STMT
   -v       Increase verbosity; may be supplied multiple times
   -x EXE   Save a successfully compiled executable as EXE instead of running it
-  -l LIB   Link to a library
 
 An rcfile "${name}rc" controls compilation if present in the same directory as
 PROGRAM, or if present in the current working directory when processing standard
@@ -41,10 +41,11 @@ If compilation is successful, the exit status is that of PROGRAM.
 "
 declare -i e=0 m=0 s=0 v=0 l=0
 declare -A E=() L=()
-while getopts e:hmp:r:st:vx:l: flag; do
+while getopts e:hl:mp:r:st:vx: flag; do
   case $flag in
     e) E[$e]=$OPTARG; ((e+=1))    ;; # To be processed later; notice 'E' not 'e'
     h) exec echo -ne "$help"      ;; # Stops processing due to exec
+    l) L[$l]=$OPTARG; ((l+=1))    ;; # Libraries to be processed later
     m) m=1                        ;; # To be processed later
     p) pkg[$OPTARG]="flag -$flag" ;; # Additively record requested package
     r) r=$OPTARG                  ;; # Record requested rcfile, last one wins
@@ -52,7 +53,6 @@ while getopts e:hmp:r:st:vx:l: flag; do
     t) T=$OPTARG;                 ;; # To be processed later; notice 'T' not 't'
     v) ((v+=1))                   ;; # Try -v, -vv, etc. to increase verbosity
     x) X=$OPTARG                  ;; # To be processed later; notice 'X' not 'x'
-    l) L[$l]=$OPTARG; ((l+=1))    ;; # Libraries to be processed later
     ?) exit;                      ;;
   esac
 done
