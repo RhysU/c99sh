@@ -21,9 +21,10 @@ gcc ./shebang.c
 # Cleanup
 rm a.out
 
-../c99sh -vv -x a.out shebang.c
-./a.out
-rm a.out
+rm -f b.out
+../c99sh -vv -x b.out shebang.c
+./b.out
+rm b.out
 
 ./quicktest.c
 gcc -c ./quicktest.c
