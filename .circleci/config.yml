@@ -4,7 +4,7 @@ version: 2.1
 jobs:
   "Test":
     docker:
-      - image: "cimg/base:lts"
+      - image: "cimg/base:2021.04"
     steps:
       - checkout
       - run:
@@ -13,11 +13,11 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y libgsl0-dev
             sudo apt-get install -y autotools-dev
-            sudo apt-get install -y g++-5
+            sudo apt-get install -y g++-10
       - run:
           name: Test c99sh
           command: |
-            COMPILER_NAME=gcc CXX=g++-5 CC=gcc-5 ./tests
+            COMPILER_NAME=gcc CXX=g++-10 CC=gcc-10 ./tests
 
 workflows:
   build:

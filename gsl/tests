@@ -4,4 +4,4 @@ cd "${0%/*}"
 
 ./gsl_example
 
-/usr/bin/time -v ./nozzle_match
+time ./nozzle_match
