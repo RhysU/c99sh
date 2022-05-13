@@ -1,0 +1,25 @@
+# See https://circleci.com/docs/2.0/reusing-config/
+version: 2.1
+
+jobs:
+  "Test":
+    docker:
+      - image: "cimg/base:lts"
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y libgsl0-dev
+            sudo apt-get install -y autotools-dev
+            sudo apt-get install -y g++-5
+      - run:
+          name: Test c99sh
+          command: |
+            COMPILER_NAME=gcc CXX=g++-5 CC=gcc-5 ./tests
+
+workflows:
+  build:
+    jobs:
+      - "Test"
