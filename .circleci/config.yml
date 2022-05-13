@@ -4,7 +4,7 @@ version: 2.1
 jobs:
   "Test":
     docker:
-      - image: "cimg/base:lts"
+      - image: "cimg/base:2021.04"
     steps:
       - checkout
       - run:
