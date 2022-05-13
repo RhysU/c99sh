@@ -9,7 +9,7 @@ name=${0##*/}
 # Maps requested pkg-config packages to the origin of the request
 declare -A pkg=()
 stderr_pkgs() {
-    for n in ${!pkg[@]}; do
+    for n in "${!pkg[@]}"; do
         echo "info: ${pkg[$n]} requested package $n" 1>&2
     done
 }
@@ -33,7 +33,7 @@ Options:
   -v       Increase verbosity; may be supplied multiple times
   -x EXE   Save a successfully compiled executable as EXE instead of running it
 
-An rcfile "${name}rc" controls compilation if present in the same directory as
+An rcfile '${name}rc' controls compilation if present in the same directory as
 PROGRAM, or if present in the current working directory when processing standard
 input.  Otherwise, if it exists, the file ~/.${name}rc controls compilation.
 
@@ -162,7 +162,7 @@ emit_main_close() {
 [[ $m -gt 0 ]] && emit_main_open
 
 # If requested, emit one or more statements possibly inside main
-for ((i = 0; i < $e; ++i)); do
+for ((i = 0; i < e; ++i)); do
     echo "${E[$i]}" >> "$c"
 done
 
@@ -184,7 +184,7 @@ then emit_main_open
 fi
 
 # Add libraries from command line options
-for ((i = 0; i < $l; ++i)); do
+for ((i = 0; i < l; ++i)); do
      logic+=("-l${L[$i]}")
 done
 
