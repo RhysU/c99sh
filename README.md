@@ -192,8 +192,11 @@ The dual shebang/compiled approach was suggested by
 [jtsagata](http://github.com/jtsagata).  Thank you both for pushing on the
 idea, as I did not think it could be done in three clean lines.
 
-The one line execution similar to Perl's -e is done by
+The one line execution similar to Perl's -e was done by
 [mattapiroglu](http://github.com/mattapiroglu).
 
 The `-l` command line option was contributed by
 [flipcoder](https://github.com/flipcoder).
+
+The `-F` and `-L` command line options were contributed by
+[ProducerMatt](https://github.com/ProducerMatt).

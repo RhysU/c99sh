@@ -32,6 +32,8 @@ Options:
   -t STMT  Append a main(argc, argv) implementation running statement STMT
   -v       Increase verbosity; may be supplied multiple times
   -x EXE   Save a successfully compiled executable as EXE instead of running it
+  -F OPT   Add '-OPT' to \$CFLAGS when using \$CFLAGS during compilation
+  -L OPT   Add '-OPT' to \$LDFLAGS when using \$LDFLAGS during linking
 
 An rcfile '${name}rc' controls compilation if present in the same directory as
 PROGRAM, or if present in the current working directory when processing standard
@@ -41,18 +43,20 @@ If compilation is successful, the exit status is that of PROGRAM.
 "
 declare -i e=0 m=0 s=0 v=0 l=0
 declare -A E=() L=()
-while getopts e:hl:mp:r:st:vx: flag; do
+while getopts e:hl:mp:r:st:vx:F:L: flag; do
   case $flag in
-    e) E[$e]=$OPTARG; ((e+=1))    ;; # To be processed later; notice 'E' not 'e'
+    e) E[$e]=$OPTARG; ((e+=1))    ;; # To process later; notice 'E' not 'e'
     h) exec echo -ne "$help"      ;; # Stops processing due to exec
     l) L[$l]=$OPTARG; ((l+=1))    ;; # Libraries to be processed later
-    m) m=1                        ;; # To be processed later
+    m) m=1                        ;; # To process later
     p) pkg[$OPTARG]="flag -$flag" ;; # Additively record requested package
     r) r=$OPTARG                  ;; # Record requested rcfile, last one wins
-    s) s=1                        ;; # To be processed later
-    t) T=$OPTARG;                 ;; # To be processed later; notice 'T' not 't'
+    s) s=1                        ;; # To process later
+    t) T=$OPTARG;                 ;; # To process later; notice 'T' not 't'
     v) ((v+=1))                   ;; # Try -v, -vv, etc. to increase verbosity
-    x) X=$OPTARG                  ;; # To be processed later; notice 'X' not 'x'
+    x) X=$OPTARG                  ;; # To process later; notice 'X' not 'x'
+    F) CFLAGS="${CFLAGS:+${CFLAGS} }-$OPTARG"    ;; # Space-separated append
+    L) LDFLAGS="${LDFLAGS:+${LDFLAGS} }-$OPTARG" ;; # Space-separated append
     ?) exit;                      ;;
   esac
 done

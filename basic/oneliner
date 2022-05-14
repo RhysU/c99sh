@@ -1,4 +1,5 @@
-#!/bin/bash -eu
+#!/bin/bash -eux
+set -o pipefail
 
 # Flag -e does not imply wrapping with main but does imply consuming some input
 ../c99sh -e 'int main() {}' </dev/null
@@ -12,6 +13,24 @@
 ../c99sh -ms </dev/null
 
 ../c99sh -mse 'printf("Hello from 1-liner\n");' </dev/null
+
+# Using -F causes the option to appear
+echo 'printf(MACRO);' | ../c99sh -ms '-FDMACRO="Salut\n"'
+
+# Further, using -F appends to CFLAGS
+(
+    export 'CFLAGS=-DANOTHER="Bonjour"'
+    echo 'printf(ANOTHER MACRO);' | ../c99sh -ms '-FDMACRO="Salut\n"'
+)
+
+# Using -L causes the option to appear thereby *breaking* this example
+! ../c99sh -mse 'printf("First test of -L\n");' -Llnonexistent </dev/null
+
+# Further, using -L appends to LDFLAGS thereby *breaking* this example
+(
+    export LDFLAGS=-lnonexistent
+    ! ../c99sh -mse 'printf("Third test of -L\n");' -Llm </dev/null
+)
 
 ../c99sh -mse 'int start = 3;' <<HERE
 return start == 3 ? 0 : 1;
