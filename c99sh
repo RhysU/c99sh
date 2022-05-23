@@ -22,17 +22,16 @@ Usage: ${name} [OPTION]... [--] PROGRAM [PROGRAMOPTION]...
 Compile ${name:0:3} PROGRAM, or standard input, and run it supplying [PROGRAMOPTION]...
 
 Options:
-  -e LINE    Prepends LINE to any input; often used in conjunction with -ms
-  -f FLAGS   Append FLAGS to compiler command
-  -h         Display this help message
-  -l LIB     Link to the library LIB
-  -m         Wrap input in canonical main(argc, argv) declaration
-  -p PKG     Make PKG headers and libraries available to PROGRAM via pkg-config(1)
-  -r RC      Load compilation settings from RC suppressing normal rcfile search
-  -s         Include all standard headers defined by ISO/IEC 9899:1999
-  -t STMT    Append a main(argc, argv) implementation running statement STMT
-  -v         Increase verbosity; may be supplied multiple times
-  -x EXE     Save a successfully compiled executable as EXE instead of running it
+  -e LINE  Prepends LINE to any input; often used in conjunction with -ms
+  -h       Display this help message
+  -l LIB   Link to the library LIB
+  -m       Wrap input in canonical main(argc, argv) declaration
+  -p PKG   Make PKG headers and libraries available to PROGRAM via pkg-config(1)
+  -r RC    Load compilation settings from RC suppressing normal rcfile search
+  -s       Include all standard headers defined by ISO/IEC 9899:1999
+  -t STMT  Append a main(argc, argv) implementation running statement STMT
+  -v       Increase verbosity; may be supplied multiple times
+  -x EXE   Save a successfully compiled executable as EXE instead of running it
 
 An rcfile '${name}rc' controls compilation if present in the same directory as
 PROGRAM, or if present in the current working directory when processing standard
@@ -40,12 +39,11 @@ input.  Otherwise, if it exists, the file ~/.${name}rc controls compilation.
 
 If compilation is successful, the exit status is that of PROGRAM.
 "
-declare -i e=0 m=0 s=0 v=0 l=0 cf=0
-declare -A E=() L=() CF=()
-while getopts e:f:hl:mp:r:st:vx: flag; do
+declare -i e=0 m=0 s=0 v=0 l=0
+declare -A E=() L=()
+while getopts e:hl:mp:r:st:vx: flag; do
   case $flag in
     e) E[$e]=$OPTARG; ((e+=1))    ;; # To be processed later; notice 'E' not 'e'
-    f) CF[$cf]=$OPTARG; ((cf+=1)) ;; # compiler flags to be processed later
     h) exec echo -ne "$help"      ;; # Stops processing due to exec
     l) L[$l]=$OPTARG; ((l+=1))    ;; # Libraries to be processed later
     m) m=1                        ;; # To be processed later
@@ -195,13 +193,13 @@ done
 [ $v -ge 1 ] && set -x
 case "${name:0:3}" in
   c11|C11)
-    "${CC-cc}"   -std=gnu11   -o "$x" "${flags[@]}" -x c   "${logic[@]}" ${CF[@]} 1>&2
+    "${CC-cc}"   -std=gnu11   -o "$x" "${flags[@]}" -x c   "${logic[@]}" 1>&2
     ;;
   c99|C99)
-    "${CC-cc}"   -std=gnu99   -o "$x" "${flags[@]}" -x c   "${logic[@]}" ${CF[@]} 1>&2
+    "${CC-cc}"   -std=gnu99   -o "$x" "${flags[@]}" -x c   "${logic[@]}" 1>&2
     ;;
   cxx|CXX)
-    "${CXX-c++}" -std=gnu++14 -o "$x" "${flags[@]}" -x c++ "${logic[@]}" ${CF[@]} 1>&2
+    "${CXX-c++}" -std=gnu++14 -o "$x" "${flags[@]}" -x c++ "${logic[@]}" 1>&2
     ;;
   *)
     fatal $LINENO "error: unrecognized language prefix - ${name:0:3}"

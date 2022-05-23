@@ -197,6 +197,3 @@ The one line execution similar to Perl's -e is done by
 
 The `-l` command line option was contributed by
 [flipcoder](https://github.com/flipcoder).
-
-The `-f` command line option was contributed by
-[ProducerMatt](https://github.com/ProducerMatt).
