@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # c99sh: A shebang-friendly script for "interpreting" single C99 files
 # from https://github.com/rhysu/c99sh.  Subject to the Simplified BSD License.
 # Implementation deliberately jumps through hoops to reduce process spawning.
