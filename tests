@@ -1,4 +1,5 @@
-#!/bin/bash -eux
+#!/usr/bin/env bash
+set -eux
 # c99sh top-level driver for all tests
 for driver in $(find . -mindepth 2 -name tests)
 do

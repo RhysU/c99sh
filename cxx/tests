@@ -1,4 +1,5 @@
-#!/bin/bash -eux
+#!/usr/bin/env bash
+set -eux
 # cxxsh test driver relying upon cxxshrc in the same directory
 cd "${0%/*}"
 

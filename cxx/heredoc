@@ -1,4 +1,5 @@
-#!/bin/bash -eux
+#!/usr/bin/env bash
+set -eux
 # C++ inside bash using a here document (in scripts skip the ../ prefix).
 ../cxxsh -sm <<HERE
 cout << "Hello, world!" << endl;
