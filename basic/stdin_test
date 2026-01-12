@@ -1,0 +1,30 @@
+#!../c99sh
+// Test that stdin is properly passed to the compiled program
+#include <stdio.h>
+#include <string.h>
+
+int main()
+{
+    char name[100];
+    int age;
+
+    // Read name from stdin
+    if (fgets(name, sizeof(name), stdin) == NULL) {
+        fprintf(stderr, "Failed to read name from stdin\n");
+        return 1;
+    }
+
+    // Remove newline if present
+    name[strcspn(name, "\n")] = 0;
+
+    // Read age from stdin
+    if (scanf("%d", &age) != 1) {
+        fprintf(stderr, "Failed to read age from stdin\n");
+        return 1;
+    }
+
+    // Output the results
+    printf("Name: %s, Age: %d\n", name, age);
+    return 0;
+}
+// vim:syntax=c
