@@ -10,7 +10,7 @@ cd "${0%/*}"
 ./heredoc
 
 # Test stdin handling - ensure stdin is properly passed to compiled program
-echo -e "Alice\n30" | ./stdin_test
+echo -e "Alice\n30" | ./process_stdin
 
 # Build
 rm -f ./a.out

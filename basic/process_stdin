@@ -7,6 +7,8 @@ int main()
 {
     char name[100];
     int age;
+    const char *expected_name = "Alice";
+    const int expected_age = 30;
 
     // Read name from stdin
     if (fgets(name, sizeof(name), stdin) == NULL) {
@@ -23,8 +25,19 @@ int main()
         return 1;
     }
 
-    // Output the results
-    printf("Name: %s, Age: %d\n", name, age);
+    // Validate the data read matches expected values
+    if (strcmp(name, expected_name) != 0) {
+        fprintf(stderr, "Error: Expected name '%s' but got '%s'\n", expected_name, name);
+        return 1;
+    }
+
+    if (age != expected_age) {
+        fprintf(stderr, "Error: Expected age %d but got %d\n", expected_age, age);
+        return 1;
+    }
+
+    // Output success message
+    printf("stdin test passed: Name: %s, Age: %d\n", name, age);
     return 0;
 }
 // vim:syntax=c
