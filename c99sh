@@ -71,7 +71,8 @@ if   [ $# -gt 0 ]
 then if   [ "$1" != "-" ]
      then f="$1"
           d=$(dirname "$1")
-          exec 0< "$1"
+          exec 3<&0          # Save original stdin to fd 3
+          exec 0< "$1"       # Redirect stdin to script file
      fi
      shift 1
 fi
@@ -176,6 +177,12 @@ done
 #   (b) errors and warnings within the file show usable line information
 echo "#line 1 \"$f\""            >>"$c"
 sed "1s|^#!.*\$|#line 2 \"$f\"|" >>"$c"
+
+# Restore original stdin if it was saved (i.e., when processing a file)
+if [ "$f" != "<stdin>" ]
+then exec 0<&3   # Restore stdin from fd 3
+     exec 3<&-   # Close fd 3
+fi
 
 # If requested, close main function about entire input
 [[ $m -gt 0 ]] && emit_main_close
