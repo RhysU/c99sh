@@ -1,0 +1,10 @@
+#!../cxxsh -SRWvv
+// C++ script relying upon -S rather than explicit #includes.
+int main()
+{
+    const std::optional<std::string_view> s{"c++17"};
+    const std::variant<int, std::string> v{std::string(*s)};
+    std::cout << "Holding " << std::get<std::string>(v) << std::endl;
+    return !s || s->size() != 5;
+}
+// vim:syntax=c

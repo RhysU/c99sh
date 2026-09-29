@@ -1,0 +1,10 @@
+#!../c99sh -sRWvv
+// C99 script relying upon -s rather than explicit #includes.
+int main()
+{
+    const int64_t n = INT64_C(42);
+    const bool ok = strlen("c99") == 3 && isdigit('9');
+    printf("Value %" PRId64 " is %s\n", n, ok ? "ok" : "bad");
+    return !ok || n != 42;
+}
+// vim:syntax=c

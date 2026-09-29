@@ -8,6 +8,8 @@ cd "${0%/*}"
 
 ./hello
 
+./headers
+
 ./oneliner
 
 ./heredoc

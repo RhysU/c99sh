@@ -1,0 +1,12 @@
+#!../c11sh -sRWvv
+// C11 script relying upon -s rather than explicit #includes.
+static_assert(alignof(max_align_t) >= alignof(int), "Alignment");
+int main()
+{
+    atomic_int a = 1;
+    atomic_fetch_add(&a, 41);
+    const char16_t u = u'x';
+    printf("Atomic %d with char16_t %d\n", atomic_load(&a), (int) u);
+    return atomic_load(&a) != 42;
+}
+// vim:syntax=c

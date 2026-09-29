@@ -7,3 +7,5 @@ cd "${0%/*}"
 "${CC-cc}" -std=gnu11 -dM -E - </dev/null | grep __STDC_VERSION__
 
 ./hello
+
+./headers

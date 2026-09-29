@@ -1,4 +1,4 @@
-#!../c11sh -svv
+#!../c11sh -vv
 // Executable C script using a shebang (in scripts use #!/usr/bin/env c11sh).
 int main()
 {

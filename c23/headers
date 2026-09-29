@@ -1,0 +1,11 @@
+#!../c23sh -sRWvv
+// C23 script relying upon -s rather than explicit #includes.
+int main()
+{
+    int sum;
+    const bool overflow = ckd_add(&sum, INT_MAX, 1);
+    const unsigned ones = stdc_count_ones_ui(0xF0u);
+    printf("Overflow %d with %u bits set\n", overflow, ones);
+    return !overflow || ones != 4;
+}
+// vim:syntax=c
