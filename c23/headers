@@ -1,4 +1,4 @@
-#!../c23sh -svv
+#!../c23sh -sRWvv
 // C23 script relying upon -s rather than explicit #includes.
 int main()
 {

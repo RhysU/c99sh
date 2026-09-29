@@ -1,4 +1,4 @@
-#!../cxxsh -sSvv
+#!../cxxsh -sSRWvv
 // C++ script relying upon -s and -S rather than explicit #includes.
 int main()
 {

@@ -1,4 +1,4 @@
-#!../c11sh -svv
+#!../c11sh -sRWvv
 // C11 script relying upon -s rather than explicit #includes.
 static_assert(alignof(max_align_t) >= alignof(int), "Alignment");
 int main()

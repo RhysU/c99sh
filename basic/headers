@@ -1,4 +1,4 @@
-#!../c99sh -svv
+#!../c99sh -sRWvv
 // C99 script relying upon -s rather than explicit #includes.
 int main()
 {
