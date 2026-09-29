@@ -3,7 +3,8 @@ c99sh
 
 <!-- vim-markdown-toc GFM -->
 * [Basic Idea](#basic-idea)
-* [Control Files](#control-files)
+* [Usage](#usage)
+* [Rcfiles](#rcfiles)
 * [Shebang Tricks](#shebang-tricks)
 * [C++](#c)
 * [C11](#c11)
@@ -19,7 +20,7 @@ A shebang-friendly script for "interpreting" single C99, C11, and C++ files,
 including rcfile support.  [![Build
 Status](https://circleci.com/gh/RhysU/c99sh.svg?style=shield)](https://app.circleci.com/pipelines/github/RhysU/c99sh)
 
-For example, installing this `~/.c99shrc` control file
+For example, installing this `~/.c99shrc` rcfile
 
     -Wall -g -O2
     #include <stdio.h>
@@ -59,18 +60,66 @@ Usually, `-sm` appears alongside `-e`:
 
 Beware quote escaping for `-e` could use some `printf` love.  Patches welcome.
 
-Control Files
--------------
+Usage
+-----
 
-Control files can supply compilation and linking flags, preprocessor directives
+Output from `c99sh -h`:
+
+    Usage: c99sh [OPTION]... [--] PROGRAM [PROGRAMOPTION]...
+     or:   c99sh [OPTION]... [--] -       [PROGRAMOPTION]...
+     or:   c99sh [OPTION]... [--]
+    Compile c99 PROGRAM, or standard input, and run it supplying [PROGRAMOPTION]...
+
+    Options:
+      -e LINE  Prepends LINE to any input; often used in conjunction with -ms
+      -h       Display this help message
+      -l LIB   Link to the library LIB
+      -m       Wrap input in canonical main(argc, argv) declaration
+      -p PKG   Make PKG headers and libraries available to PROGRAM via pkg-config(1)
+      -r RC    Load compilation settings from RC suppressing normal rcfile search
+      -s       Include all standard C, not C++, headers for the language standard
+      -t STMT  Append a main(argc, argv) implementation running statement STMT
+      -v       Increase verbosity; may be supplied multiple times
+      -x EXE   Save a successfully compiled executable as EXE instead of running it
+      -F OPT   Add '-OPT' to $CFLAGS when using $CFLAGS during compilation
+      -L OPT   Add '-OPT' to $LDFLAGS when using $LDFLAGS during linking
+      -R       Suppress rcfile loading; equivalent to -r /dev/null
+      -S       Include all standard C++ library headers for the language standard
+      -W       Enable and enforce warnings; equivalent to -F Wall -F Werror
+
+    An rcfile 'c99shrc' controls compilation if present in the same directory as
+    PROGRAM, or if present in the current working directory when processing standard
+    input.  Otherwise, if it exists, the file ~/.c99shrc controls compilation.
+
+    Each non-blank rcfile line must be a // comment, compiler flags, a preprocessor
+    directive, a C++ using or namespace directive, a pkg-config request, linker
+    flags, or a source, object, or archive file to build alongside PROGRAM.
+    For example:
+
+      // Single-line comment
+      -O2 -Wall
+      #include <sqlite3.h>
+      using std::vector
+      namespace fs = std::filesystem
+      pkg-config sqlite3
+      -L/foo/lib -lfoo -lm
+      /bar/extra_source.c
+      /bar/libextra.a
+
+    If compilation is successful, the exit status is that of PROGRAM.
+
+Rcfiles
+-------
+
+Rcfiles can supply compilation and linking flags, preprocessor directives
 like `#include`, and
 [pkg-config](http://www.freedesktop.org/wiki/Software/pkg-config/) directives to
 simplify library usage. A `c99shrc` located in the same directory as the
 interpreted source will be used. Otherwise a `~/.c99shrc` is processed if
-available. See [c99shrc.example](c99shrc.example) for an extended control file
+available. See [c99shrc.example](c99shrc.example) for an extended rcfile
 enabling [GSL](http://www.gnu.org/software/gsl/),
 [GLib](https://developer.gnome.org/glib/), and [SQLite](http://www.sqlite.org/)
-capabilities.  Control files ease accessing libraries with higher-level
+capabilities.  Rcfiles ease accessing libraries with higher-level
 data structures.
 
 A more entertaining example is an [OpenMP](http://openmp.org/wp/)-enabled Monte
@@ -157,7 +206,7 @@ C++
 
 As nearly the entire C99-oriented implementation works for C++, by invoking
 [c99sh](c99sh) through either a copy or symlink named [cxxsh](cxxsh), you can
-write C++-based logic.  The relevant control files are named like `cxxshrc` in
+write C++-based logic.  The relevant rcfiles are named like `cxxshrc` in
 this case and they support directives like `using namespace std` and `namespace
 fb = foo::bar`.  See [cxx/hello](cxx/hello) and [cxx/cxxshrc](cxx/cxxshrc) for a
 hello world C++ example.  See [cxx/shebang.cpp](cxx/shebang.cpp) and
@@ -174,13 +223,13 @@ prohibitively expensive.
 C11
 ---
 
-C11 can be used via a symlink named [c11sh](c11sh) with control files like
+C11 can be used via a symlink named [c11sh](c11sh) with rcfiles like
 `c11shrc`.
 
 C23
 ---
 
-C23 can be used via a symlink named [c23sh](c23sh) with control files like
+C23 can be used via a symlink named [c23sh](c23sh) with rcfiles like
 `c23shrc`.
 
 Credits
