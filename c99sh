@@ -45,6 +45,7 @@ Options:
 An rcfile '${name}rc' controls compilation if present in the same directory as
 PROGRAM, or if present in the current working directory when processing standard
 input.  Otherwise, if it exists, the file ~/.${name}rc controls compilation.
+
 Each non-blank rcfile line must be a // comment, compiler flags, a preprocessor
 directive, a C++ using or namespace directive, a pkg-config request, linker
 flags, or a source file to compile alongside PROGRAM.  For example:
