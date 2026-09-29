@@ -58,8 +58,8 @@ For example:
   namespace fs = std::filesystem
   pkg-config sqlite3
   -L/opt/foo/lib -lfoo -lm
-  /opt/bar/extra_source.c
-  /opt/bar/libextra.a
+  /foo/bar/extra_source.c
+  /foo/bar/libextra.a
 
 If compilation is successful, the exit status is that of PROGRAM.
 "
