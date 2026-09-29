@@ -8,7 +8,11 @@ cd "${0%/*}"
 
 ./hello
 
-./headers
+./headers-c11
+
+./headers-c++17
+
+./headers-both
 
 ./heredoc
 

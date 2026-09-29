@@ -2,10 +2,10 @@
 // C++ script relying upon -s and -S rather than explicit #includes.
 int main()
 {
-    std::vector<int> v{3, 1, 4, 1, 5, 9, 2, 6};
+    std::vector<std::int64_t> v{3, 1, 4, 1, 5, 9, 2, 6};
     std::sort(v.begin(), v.end());
-    const int max = *std::max_element(v.begin(), v.end());
-    std::printf("Sorted %zu values with max %d\n", v.size(), max);
+    const std::int64_t max = *std::max_element(v.begin(), v.end());
+    std::printf("Sorted %zu values with max %" PRId64 "\n", v.size(), max);
     return !std::is_sorted(v.begin(), v.end()) || max != 9;
 }
 // vim:syntax=c

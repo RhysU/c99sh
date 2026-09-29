@@ -1,0 +1,10 @@
+#!../cxxsh -svv
+// C++ script relying upon -s rather than explicit #includes.
+int main()
+{
+    const std::int64_t n = INT64_C(42);
+    const bool ok = std::strlen("c11") == 3 && std::isdigit('1');
+    std::printf("Value %" PRId64 " is %s\n", n, ok ? "ok" : "bad");
+    return !ok || n != 42;
+}
+// vim:syntax=c
