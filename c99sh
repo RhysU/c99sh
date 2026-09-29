@@ -150,7 +150,7 @@ fi
 
 # Logic for accumulating details from some named rcfile
 declare -a flags=(${CFLAGS-} "-I$d")      # CPPFLAGS, CFLAGS
-declare -a logic=("$c" ${LDFLAGS-})       # Sources, LDFLAGS, LIBS
+declare -a logic=("$c" -x none ${LDFLAGS-}) # Sources, LDFLAGS, LIBS
 process_rcfile() {
   [ $v -ge 1 ] && echo "info: using rcfile $1" 1>&2
   local i=0

@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -eux
+cd "${0%/*}"
+# Rcfile lines naming archives or objects must link, not compile as source.
+t=$(mktemp -d "${TMPDIR-/tmp}/rcfile_target.XXXXXX")
+trap 'rm -rf "$t"' EXIT
+
+echo 'int answer(void) { return 42; }' | "${CC-cc}" -x c -c -o "$t/answer.o" -
+ar rc "$t/libanswer.a" "$t/answer.o"
+
+echo "$t/answer.o"     > "$t/object.rc"
+echo "$t/libanswer.a"  > "$t/archive.rc"
+
+for rc in "$t/object.rc" "$t/archive.rc"; do
+    echo 'int answer(void); int main() { return answer() != 42; }' \
+        | ../c99sh -r "$rc" -
+    echo 'extern "C" int answer(); int main() { return answer() != 42; }' \
+        | ../cxxsh -r "$rc" -
+done
