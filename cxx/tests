@@ -4,6 +4,7 @@ set -eux
 cd "${0%/*}"
 
 "${CXX-c++}" --version
+"${CXX-c++}" -std=gnu++17 -dM -E -x c++ - </dev/null | grep __cplusplus
 
 ./hello
 
