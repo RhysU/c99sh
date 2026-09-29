@@ -152,6 +152,7 @@ fi
 declare -a flags=(${CFLAGS-} "-I$d")      # CPPFLAGS, CFLAGS
 declare -a logic=("$c" ${LDFLAGS-})       # Sources, LDFLAGS, LIBS
 process_rcfile() {
+  [ $v -ge 1 ] && echo "info: using rcfile $1" 1>&2
   local i=0
   while IFS=$' \t\n' read -r o; do
     echo "#line $((i+=1)) \"$1\" // $o" >>"$c"   # Record line in munged source
