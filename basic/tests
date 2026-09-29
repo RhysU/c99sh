@@ -14,6 +14,8 @@ cd "${0%/*}"
 
 ./heredoc
 
+./rcfile_target
+
 # Test stdin handling - ensure stdin is properly passed to compiled program
 echo -e "Alice\n30" | ./process_stdin
 
