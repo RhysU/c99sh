@@ -45,9 +45,9 @@ Options:
 An rcfile '${name}rc' controls compilation if present in the same directory as
 PROGRAM, or if present in the current working directory when processing standard
 input.  Otherwise, if it exists, the file ~/.${name}rc controls compilation.
-Each rcfile line is blank, a // comment, a preprocessor directive, compiler
-flags, linker flags, a pkg-config request, a C++ using or namespace directive,
-or a source file to compile alongside PROGRAM.  For example:
+Each non-blank rcfile line must be a // comment, a preprocessor directive,
+compiler flags, linker flags, a pkg-config request, a C++ using or namespace
+directive, or a source file to compile alongside PROGRAM.  For example:
 
   // Single-line comment
   #include <gsl/gsl_math.h>
