@@ -125,7 +125,7 @@ fi
 if [ $S -gt 0 ]
 then echo "#line $LINENO \"$0\"" >>"$c"
      case "$lang" in
-     c99|C99|c11|C11|c23|C23)
+     [cC][0-9][0-9])
         fatal $LINENO "error: -S not applicable to language prefix - $lang" ;;
      # Excludes the C++17 deprecated <codecvt> and <strstream>
      cxx|CXX) include algorithm any array atomic bitset chrono complex    \
