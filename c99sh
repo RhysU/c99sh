@@ -152,7 +152,7 @@ fi
 declare -a flags=(${CFLAGS-} "-I$d")      # CPPFLAGS, CFLAGS
 declare -a logic=("$c" ${LDFLAGS-})       # Sources, LDFLAGS, LIBS
 process_rcfile() {
-  [ $v -ge 1 ] && echo "info: using rcfile $1" 1>&2
+  rc=$1
   local i=0
   while IFS=$' \t\n' read -r o; do
     echo "#line $((i+=1)) \"$1\" // $o" >>"$c"   # Record line in munged source
@@ -254,6 +254,7 @@ done
 # Compile the generated source with appropriate verbosity
 [ $v -ge 2 ] && cat "$c" 1>&2
 [ $v -ge 1 ] && set -x
+: rcfile "${rc-}" # No-op naming the rcfile within any -v trace
 case "$lang" in
   c11|C11)
     "${CC-cc}"   -std=gnu11   -o "$x" "${flags[@]}" -x c   "${logic[@]}" 1>&2
