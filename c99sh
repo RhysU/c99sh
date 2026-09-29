@@ -82,15 +82,20 @@ x=$(mktemp "${TMPDIR-/tmp}/${name:0:3}sh.XXXXXX") # Compiled binary to be run
 trap 'rm -f "$c" "$x"' EXIT                       # Automatic cleanup on exit
 
 # If requested, include all standard C99 headers in either C or C++ fashion
+# Excludes the C++17 deprecated <ccomplex>, <cstdbool>, and <ctgmath> for C++
 if [ $s -gt 0 ]
 then echo "#line $LINENO \"$0\"" >>"$c"
-     head=( assert complex ctype errno fenv float inttypes iso646
+     hc99=( assert complex ctype errno fenv float inttypes iso646
             limits locale math setjmp signal stdarg stdbool stddef
             stdint stdio stdlib string tgmath time wchar wctype )
+     hcxx=( assert  omplex ctype errno fenv float inttypes iso646  # Hack!
+            limits locale math setjmp signal stdarg         stddef
+            stdint stdio stdlib string        time wchar wctype )
      case "${name:0:3}" in
-     c99|C99) for h in "${head[@]}"; do echo "#include <${h}.h>" >>"$c"; done ;;
-     c11|C11) for h in "${head[@]}"; do echo "#include <${h}.h>" >>"$c"; done ;;
-     cxx|CXX) for h in "${head[@]}"; do echo "#include <c${h}>"  >>"$c"; done ;;
+     c99|C99) for h in "${hc99[@]}"; do echo "#include <${h}.h>" >>"$c"; done ;;
+     c11|C11) for h in "${hc99[@]}"; do echo "#include <${h}.h>" >>"$c"; done ;;
+     c23|C23) for h in "${hc99[@]}"; do echo "#include <${h}.h>" >>"$c"; done ;;
+     cxx|CXX) for h in "${hcxx[@]}"; do echo "#include <c${h}>"  >>"$c"; done ;;
      esac
 fi
 
@@ -206,11 +211,14 @@ case "${name:0:3}" in
   c11|C11)
     "${CC-cc}"   -std=gnu11   -o "$x" "${flags[@]}" -x c   "${logic[@]}" 1>&2
     ;;
+  c23|C23)
+    "${CC-cc}"   -std=gnu23   -o "$x" "${flags[@]}" -x c   "${logic[@]}" 1>&2
+    ;;
   c99|C99)
     "${CC-cc}"   -std=gnu99   -o "$x" "${flags[@]}" -x c   "${logic[@]}" 1>&2
     ;;
   cxx|CXX)
-    "${CXX-c++}" -std=gnu++14 -o "$x" "${flags[@]}" -x c++ "${logic[@]}" 1>&2
+    "${CXX-c++}" -std=gnu++17 -o "$x" "${flags[@]}" -x c++ "${logic[@]}" 1>&2
     ;;
   *)
     fatal $LINENO "error: unrecognized language prefix - ${name:0:3}"

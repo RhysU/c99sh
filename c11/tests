@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -eux
+# c11sh test driver relying upon c11shrc in the same directory
+cd "${0%/*}"
+
+"${CC-cc}" --version
+"${CC-cc}" -std=gnu11 -dM -E - </dev/null | grep __STDC_VERSION__
+
+./hello

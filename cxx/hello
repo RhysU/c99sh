@@ -1,7 +1,8 @@
-#!../cxxsh
+#!../cxxsh -vv
 // Executable C++ script using a shebang (in scripts use #!/usr/bin/env cxxsh).
 int main()
 {
-    cout << "Hello, world!" << endl;
+    cout << "Hello, world from __cplusplus: " << __cplusplus << endl;
+    return __cplusplus < 201703L;
 }
 // vim:syntax=c

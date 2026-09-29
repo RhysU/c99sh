@@ -1,0 +1,3 @@
+-Wall
+// Comments!
+#include <stdio.h>

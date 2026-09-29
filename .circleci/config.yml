@@ -5,7 +5,7 @@ jobs:
   "Test":
     resource_class: small
     docker:
-      - image: "cimg/base:2024.09"
+      - image: "cimg/base:2026.09"
     steps:
       - checkout
       - run:
@@ -14,11 +14,11 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y libgsl-dev
             sudo apt-get install -y autotools-dev
-            sudo apt-get install -y gcc g++
+            sudo apt-get install -y gcc-14 g++-14
       - run:
           name: Test c99sh
           command: |
-            COMPILER_NAME=gcc CXX=g++ CC=gcc ./tests
+            CC=/usr/bin/gcc-14 CXX=/usr/bin/g++-14 ./tests
 
 workflows:
   build:
