@@ -149,6 +149,7 @@ then echo "#line $LINENO \"$0\"" >>"$c"
 fi
 
 # Logic for accumulating details from some named rcfile
+# Option -x none restores suffix-based typing so linker targets link
 declare -a flags=(${CFLAGS-} "-I$d")      # CPPFLAGS, CFLAGS
 declare -a logic=("$c" -x none ${LDFLAGS-}) # Sources, LDFLAGS, LIBS
 process_rcfile() {
