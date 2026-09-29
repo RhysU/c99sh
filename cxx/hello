@@ -3,6 +3,6 @@
 int main()
 {
     cout << "Hello, world from __cplusplus: " << __cplusplus << endl;
-    return __cplusplus >= 201703L;
+    return __cplusplus < 201703L;
 }
 // vim:syntax=c
