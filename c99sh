@@ -49,7 +49,7 @@ Each rcfile line is blank, a // comment, a preprocessor directive, compiler
 flags, linker flags, a pkg-config request, a C++ using or namespace directive,
 or a source file to compile alongside PROGRAM.  For example:
 
-  // Numerics
+  // Single-line comment
   #include <gsl/gsl_math.h>
   -O2 -Wall
   -L/opt/foo/lib -lfoo -lm
