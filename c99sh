@@ -33,6 +33,7 @@ Options:
   -p PKG   Make PKG headers and libraries available to PROGRAM via pkg-config(1)
   -r RC    Load compilation settings from RC suppressing normal rcfile search
   -s       Include all standard C, not C++, headers for the language standard
+  -S       Include all standard C++ library headers for the language standard
   -t STMT  Append a main(argc, argv) implementation running statement STMT
   -v       Increase verbosity; may be supplied multiple times
   -x EXE   Save a successfully compiled executable as EXE instead of running it
@@ -45,9 +46,9 @@ input.  Otherwise, if it exists, the file ~/.${name}rc controls compilation.
 
 If compilation is successful, the exit status is that of PROGRAM.
 "
-declare -i e=0 m=0 s=0 v=0 l=0
+declare -i e=0 m=0 s=0 S=0 v=0 l=0
 declare -A E=() L=()
-while getopts e:hl:mp:r:st:vx:F:L: flag; do
+while getopts e:hl:mp:r:sSt:vx:F:L: flag; do
   case $flag in
     e) E[$e]=$OPTARG; ((e+=1))    ;; # To process later; notice 'E' not 'e'
     h) exec echo -ne "$help"      ;; # Stops processing due to exec
@@ -56,6 +57,7 @@ while getopts e:hl:mp:r:st:vx:F:L: flag; do
     p) pkg[$OPTARG]="flag -$flag" ;; # Additively record requested package
     r) r=$OPTARG                  ;; # Record requested rcfile, last one wins
     s) s=1                        ;; # To process later
+    S) S=1                        ;; # To process later
     t) T=$OPTARG;                 ;; # To process later; notice 'T' not 't'
     v) ((v+=1))                   ;; # Try -v, -vv, etc. to increase verbosity
     x) X=$OPTARG                  ;; # To process later; notice 'X' not 'x'
@@ -85,21 +87,22 @@ c=$(mktemp "${TMPDIR-/tmp}/${lang}sh.XXXXXX") # Mangled source for compiling
 x=$(mktemp "${TMPDIR-/tmp}/${lang}sh.XXXXXX") # Compiled binary to be run
 trap 'rm -f "$c" "$x"' EXIT                  # Automatic cleanup on exit
 
+# Guards skip headers C11 permits omitting via __STDC_NO_*__ macros
+declare -Ar guard=( [complex.h]=__STDC_NO_COMPLEX__
+                    [stdatomic.h]=__STDC_NO_ATOMICS__
+                    [threads.h]=__STDC_NO_THREADS__ )
+include() {
+  for h in "$@"; do
+    if [ -n "${guard[$h]-}" ]
+    then printf "#ifndef %s\n#include <%s>\n#endif\n" "${guard[$h]}" "$h"
+    else printf "#include <%s>\n" "$h"
+    fi
+  done >>"$c"
+}
+
 # If requested, include all standard C headers in either C or C++ fashion
 if [ $s -gt 0 ]
 then echo "#line $LINENO \"$0\"" >>"$c"
-     # Guards skip headers C11 permits omitting via __STDC_NO_*__ macros
-     declare -Ar guard=( [complex.h]=__STDC_NO_COMPLEX__
-                         [stdatomic.h]=__STDC_NO_ATOMICS__
-                         [threads.h]=__STDC_NO_THREADS__ )
-     include() {
-       for h in "$@"; do
-         if [ -n "${guard[$h]-}" ]
-         then printf "#ifndef %s\n#include <%s>\n#endif\n" "${guard[$h]}" "$h"
-         else printf "#include <%s>\n" "$h"
-         fi
-       done >>"$c"
-     }
      case "$lang" in
      c23|C23) include stdbit.h stdckdint.h ;&                  # Fallthrough
      c11|C11) include stdalign.h stdatomic.h stdnoreturn.h \
@@ -114,6 +117,28 @@ then echo "#line $LINENO \"$0\"" >>"$c"
                       cinttypes ciso646 climits clocale cmath csetjmp     \
                       csignal cstdarg cstddef cstdint cstdio cstdlib      \
                       cstring ctime cuchar cwchar cwctype ;;
+     *) fatal $LINENO "error: unrecognized language prefix - $lang" ;;
+     esac
+fi
+
+# If requested, include all standard C++ library headers
+if [ $S -gt 0 ]
+then echo "#line $LINENO \"$0\"" >>"$c"
+     case "$lang" in
+     c99|C99|c11|C11|c23|C23)
+        fatal $LINENO "error: -S not applicable to language prefix - $lang" ;;
+     # Excludes the C++17 deprecated <codecvt> and <strstream>
+     cxx|CXX) include algorithm any array atomic bitset chrono complex    \
+                      condition_variable deque exception execution        \
+                      filesystem forward_list fstream functional future   \
+                      initializer_list iomanip ios iosfwd iostream        \
+                      istream iterator limits list locale map memory      \
+                      memory_resource mutex new numeric optional ostream  \
+                      queue random ratio regex scoped_allocator set       \
+                      shared_mutex sstream stack stdexcept streambuf      \
+                      string string_view system_error thread tuple        \
+                      type_traits typeindex typeinfo unordered_map        \
+                      unordered_set utility valarray variant vector ;;
      *) fatal $LINENO "error: unrecognized language prefix - $lang" ;;
      esac
 fi
