@@ -63,8 +63,7 @@ Beware quote escaping for `-e` could use some `printf` love.  Patches welcome.
 Usage
 -----
 
-Output from `c99sh -h`:
-
+    $ c99sh -h
     Usage: c99sh [OPTION]... [--] PROGRAM [PROGRAMOPTION]...
      or:   c99sh [OPTION]... [--] -       [PROGRAMOPTION]...
      or:   c99sh [OPTION]... [--]

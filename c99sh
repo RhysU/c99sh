@@ -19,6 +19,7 @@ stderr_pkgs() {
 }
 
 # Process c99sh flags (not arguments to the interpreted script)
+# Keep README.md Usage section in sync
 help="\
 Usage: ${name} [OPTION]... [--] PROGRAM [PROGRAMOPTION]...
  or:   ${name} [OPTION]... [--] -       [PROGRAMOPTION]...
