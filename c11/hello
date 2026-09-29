@@ -1,8 +1,8 @@
-#!../c99sh
+#!../c11sh
 // Executable C script using a shebang (in scripts use #!/usr/bin/env c11sh).
 int main()
 {
     printf("Hello, world from __STDC_VERSION__: %ld\n", __STDC_VERSION__);
-    return __STDC_VERSION__ != 199901L;
+    return __STDC_VERSION__ != 201112L;
 }
 // vim:syntax=c

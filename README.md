@@ -7,6 +7,7 @@ c99sh
 * [Shebang Tricks](#shebang-tricks)
 * [C++](#c)
 * [C11](#c11)
+* [C23](#c23)
 * [Credits](#credits)
 
 <!-- vim-markdown-toc -->
@@ -175,6 +176,12 @@ C11
 
 C11 can be used via a symlink named [c11sh](c11sh) with control files like
 `c11shrc`.
+
+C23
+---
+
+C23 can be used via a symlink named [c23sh](c23sh) with control files like
+`c23shrc`.
 
 Credits
 -------

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -eux
+# c23sh test driver relying upon c23shrc in the same directory
+cd "${0%/*}"
+
+./hello

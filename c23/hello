@@ -1,0 +1,8 @@
+#!../c23sh
+// Executable C script using a shebang (in scripts use #!/usr/bin/env c23sh).
+int main()
+{
+    printf("Hello, world from __STDC_VERSION__: %ld\n", __STDC_VERSION__);
+    return __STDC_VERSION__ != 202311L;
+}
+// vim:syntax=c

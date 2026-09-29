@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -eux
+# c11sh test driver relying upon c11shrc in the same directory
+cd "${0%/*}"
+
+./hello
