@@ -14,11 +14,11 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y libgsl-dev
             sudo apt-get install -y autotools-dev
-            sudo apt-get install -y gcc-14 g++-14
+            sudo apt-get install -y gcc-15 g++-15
       - run:
           name: Test c99sh
           command: |
-            CC=/usr/bin/gcc-14 CXX=/usr/bin/g++-14 ./tests
+            CC=/usr/bin/gcc-15 CXX=/usr/bin/g++-15 ./tests
 
 workflows:
   build:
