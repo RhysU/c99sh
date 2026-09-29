@@ -1,4 +1,4 @@
-#!../cxxsh -vv
+#!../cxxsh -svv
 // Executable C++ script using a shebang (in scripts use #!/usr/bin/env cxxsh).
 int main()
 {

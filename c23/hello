@@ -1,4 +1,4 @@
-#!../c23sh -vv
+#!../c23sh -svv
 // Executable C script using a shebang (in scripts use #!/usr/bin/env c23sh).
 int main()
 {
