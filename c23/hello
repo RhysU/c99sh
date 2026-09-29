@@ -3,6 +3,6 @@
 int main()
 {
     printf("Hello, world from __STDC_VERSION__: %ld\n", __STDC_VERSION__);
-    return __STDC_VERSION__ != 202311L;
+    return __STDC_VERSION__ != 202311L;  // Beware gcc-14 reports differently
 }
 // vim:syntax=c
