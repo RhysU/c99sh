@@ -1,4 +1,4 @@
-#!../c99sh -svv
+#!../c99sh -vv
 // Executable C script using a shebang (in scripts use #!/usr/bin/env c99sh).
 int main()
 {
