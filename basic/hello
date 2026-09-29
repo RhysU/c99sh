@@ -1,5 +1,5 @@
-#!../c99sh -vv
-// Executable C script using a shebang (in scripts use #!/usr/bin/env c11sh).
+#!../c99sh -svv
+// Executable C script using a shebang (in scripts use #!/usr/bin/env c99sh).
 int main()
 {
     printf("Hello, world from __STDC_VERSION__: %ld\n", __STDC_VERSION__);

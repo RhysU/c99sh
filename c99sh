@@ -5,6 +5,10 @@
 set -eu
 shopt -s extglob
 name=${0##*/}
+lang=${name:0:3}
+
+# Assists in reporting formatted errors to stderr followed by exiting
+fatal() { status=$1; shift; printf "$@" 1>&2; echo 1>&2; exit $status; }
 
 # Maps requested pkg-config packages to the origin of the request
 declare -A pkg=()
@@ -19,7 +23,7 @@ help="\
 Usage: ${name} [OPTION]... [--] PROGRAM [PROGRAMOPTION]...
  or:   ${name} [OPTION]... [--] -       [PROGRAMOPTION]...
  or:   ${name} [OPTION]... [--]
-Compile ${name:0:3} PROGRAM, or standard input, and run it supplying [PROGRAMOPTION]...
+Compile $lang PROGRAM, or standard input, and run it supplying [PROGRAMOPTION]...
 
 Options:
   -e LINE  Prepends LINE to any input; often used in conjunction with -ms
@@ -28,7 +32,7 @@ Options:
   -m       Wrap input in canonical main(argc, argv) declaration
   -p PKG   Make PKG headers and libraries available to PROGRAM via pkg-config(1)
   -r RC    Load compilation settings from RC suppressing normal rcfile search
-  -s       Include all standard headers defined by ISO/IEC 9899:1999
+  -s       Include all standard C, not C++, headers for the language standard
   -t STMT  Append a main(argc, argv) implementation running statement STMT
   -v       Increase verbosity; may be supplied multiple times
   -x EXE   Save a successfully compiled executable as EXE instead of running it
@@ -77,30 +81,42 @@ then if   [ "$1" != "-" ]
      shift 1
 fi
 
-c=$(mktemp "${TMPDIR-/tmp}/${name:0:3}sh.XXXXXX") # Mangled source for compiling
-x=$(mktemp "${TMPDIR-/tmp}/${name:0:3}sh.XXXXXX") # Compiled binary to be run
-trap 'rm -f "$c" "$x"' EXIT                       # Automatic cleanup on exit
+c=$(mktemp "${TMPDIR-/tmp}/${lang}sh.XXXXXX") # Mangled source for compiling
+x=$(mktemp "${TMPDIR-/tmp}/${lang}sh.XXXXXX") # Compiled binary to be run
+trap 'rm -f "$c" "$x"' EXIT                  # Automatic cleanup on exit
 
-# If requested, include all standard C99 headers in either C or C++ fashion
-# Excludes the C++17 deprecated <ccomplex>, <cstdbool>, and <ctgmath> for C++
+# If requested, include all standard C headers in either C or C++ fashion
 if [ $s -gt 0 ]
 then echo "#line $LINENO \"$0\"" >>"$c"
-     hc99=( assert complex ctype errno fenv float inttypes iso646
-            limits locale math setjmp signal stdarg stdbool stddef
-            stdint stdio stdlib string tgmath time wchar wctype )
-     hcxx=( assert  omplex ctype errno fenv float inttypes iso646  # Hack!
-            limits locale math setjmp signal stdarg         stddef
-            stdint stdio stdlib string        time wchar wctype )
-     case "${name:0:3}" in
-     c99|C99) for h in "${hc99[@]}"; do echo "#include <${h}.h>" >>"$c"; done ;;
-     c11|C11) for h in "${hc99[@]}"; do echo "#include <${h}.h>" >>"$c"; done ;;
-     c23|C23) for h in "${hc99[@]}"; do echo "#include <${h}.h>" >>"$c"; done ;;
-     cxx|CXX) for h in "${hcxx[@]}"; do echo "#include <c${h}>"  >>"$c"; done ;;
+     # Guards skip headers C11 permits omitting via __STDC_NO_*__ macros
+     declare -Ar guard=( [complex.h]=__STDC_NO_COMPLEX__
+                         [stdatomic.h]=__STDC_NO_ATOMICS__
+                         [threads.h]=__STDC_NO_THREADS__ )
+     include() {
+       for h in "$@"; do
+         if [ -n "${guard[$h]-}" ]
+         then printf "#ifndef %s\n#include <%s>\n#endif\n" "${guard[$h]}" "$h"
+         else printf "#include <%s>\n" "$h"
+         fi
+       done >>"$c"
+     }
+     case "$lang" in
+     c23|C23) include stdbit.h stdckdint.h ;&                  # Fallthrough
+     c11|C11) include stdalign.h stdatomic.h stdnoreturn.h \
+                      threads.h uchar.h ;&                     # Fallthrough
+     c99|C99) include assert.h complex.h ctype.h errno.h fenv.h float.h     \
+                      inttypes.h iso646.h limits.h locale.h math.h setjmp.h \
+                      signal.h stdarg.h stdbool.h stddef.h stdint.h stdio.h \
+                      stdlib.h string.h tgmath.h time.h wchar.h wctype.h ;;
+     # Excludes the C++17 deprecated <ccomplex>, <cstdalign>, <cstdbool>,
+     # and <ctgmath> and the C11 headers lacking C++17 counterparts
+     cxx|CXX) include cassert complex cctype cerrno cfenv cfloat          \
+                      cinttypes ciso646 climits clocale cmath csetjmp     \
+                      csignal cstdarg cstddef cstdint cstdio cstdlib      \
+                      cstring ctime cuchar cwchar cwctype ;;
+     *) fatal $LINENO "error: unrecognized language prefix - $lang" ;;
      esac
 fi
-
-# Assists in reporting formatted errors to stderr followed by exiting
-fatal() { status=$1; shift; printf "$@" 1>&2; echo 1>&2; exit $status; }
 
 # Logic for accumulating details from some named rcfile
 declare -a flags=(${CFLAGS-} "-I$d")      # CPPFLAGS, CFLAGS
@@ -207,7 +223,7 @@ done
 # Compile the generated source with appropriate verbosity
 [ $v -ge 2 ] && cat "$c" 1>&2
 [ $v -ge 1 ] && set -x
-case "${name:0:3}" in
+case "$lang" in
   c11|C11)
     "${CC-cc}"   -std=gnu11   -o "$x" "${flags[@]}" -x c   "${logic[@]}" 1>&2
     ;;
@@ -221,7 +237,7 @@ case "${name:0:3}" in
     "${CXX-c++}" -std=gnu++17 -o "$x" "${flags[@]}" -x c++ "${logic[@]}" 1>&2
     ;;
   *)
-    fatal $LINENO "error: unrecognized language prefix - ${name:0:3}"
+    fatal $LINENO "error: unrecognized language prefix - $lang"
     ;;
 esac
 
