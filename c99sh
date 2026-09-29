@@ -55,6 +55,7 @@ For example:
   -O2 -Wall
   #include <sqlite3.h>
   using std::vector
+  namespace fs = std::filesystem
   pkg-config sqlite3
   -L/opt/foo/lib -lfoo -lm
   /opt/bar/extra_source.c
