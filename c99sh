@@ -48,7 +48,8 @@ input.  Otherwise, if it exists, the file ~/.${name}rc controls compilation.
 
 Each non-blank rcfile line must be a // comment, compiler flags, a preprocessor
 directive, a C++ using or namespace directive, a pkg-config request, linker
-flags, or a source file to compile alongside PROGRAM.  For example:
+flags, or a source, object, or archive file to build alongside PROGRAM.
+For example:
 
   // Single-line comment
   -O2 -Wall
@@ -57,6 +58,7 @@ flags, or a source file to compile alongside PROGRAM.  For example:
   pkg-config sqlite3
   -L/opt/foo/lib -lfoo -lm
   /opt/bar/extra_source.c
+  /opt/bar/libextra.a
 
 If compilation is successful, the exit status is that of PROGRAM.
 "
