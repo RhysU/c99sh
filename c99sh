@@ -57,9 +57,9 @@ For example:
   using std::vector
   namespace fs = std::filesystem
   pkg-config sqlite3
-  -L/opt/foo/lib -lfoo -lm
-  /foo/bar/extra_source.c
-  /foo/bar/libextra.a
+  -L/foo/lib -lfoo -lm
+  /bar/extra_source.c
+  /bar/libextra.a
 
 If compilation is successful, the exit status is that of PROGRAM.
 "
