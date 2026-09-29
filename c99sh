@@ -38,7 +38,9 @@ Options:
   -x EXE   Save a successfully compiled executable as EXE instead of running it
   -F OPT   Add '-OPT' to \$CFLAGS when using \$CFLAGS during compilation
   -L OPT   Add '-OPT' to \$LDFLAGS when using \$LDFLAGS during linking
+  -R       Suppress rcfile loading; equivalent to -r /dev/null
   -S       Include all standard C++ library headers for the language standard
+  -W       Enable and enforce warnings; equivalent to -F Wall -F Werror
 
 An rcfile '${name}rc' controls compilation if present in the same directory as
 PROGRAM, or if present in the current working directory when processing standard
@@ -48,7 +50,7 @@ If compilation is successful, the exit status is that of PROGRAM.
 "
 declare -i e=0 m=0 s=0 S=0 v=0 l=0
 declare -A E=() L=()
-while getopts e:hl:mp:r:st:vx:F:L:S flag; do
+while getopts e:hl:mp:r:st:vx:F:L:RSW flag; do
   case $flag in
     e) E[$e]=$OPTARG; ((e+=1))    ;; # To process later; notice 'E' not 'e'
     h) exec echo -ne "$help"      ;; # Stops processing due to exec
@@ -62,7 +64,9 @@ while getopts e:hl:mp:r:st:vx:F:L:S flag; do
     x) X=$OPTARG                  ;; # To process later; notice 'X' not 'x'
     F) CFLAGS="${CFLAGS:+${CFLAGS} }-$OPTARG"    ;; # Space-separated append
     L) LDFLAGS="${LDFLAGS:+${LDFLAGS} }-$OPTARG" ;; # Space-separated append
+    R) r=/dev/null                ;; # Equivalent to -r /dev/null
     S) S=1                        ;; # To process later
+    W) CFLAGS="${CFLAGS:+${CFLAGS} }-Wall -Werror" ;; # Space-separated append
     ?) exit;                      ;;
   esac
 done
