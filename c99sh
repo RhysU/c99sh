@@ -33,12 +33,12 @@ Options:
   -p PKG   Make PKG headers and libraries available to PROGRAM via pkg-config(1)
   -r RC    Load compilation settings from RC suppressing normal rcfile search
   -s       Include all standard C, not C++, headers for the language standard
-  -S       Include all standard C++ library headers for the language standard
   -t STMT  Append a main(argc, argv) implementation running statement STMT
   -v       Increase verbosity; may be supplied multiple times
   -x EXE   Save a successfully compiled executable as EXE instead of running it
   -F OPT   Add '-OPT' to \$CFLAGS when using \$CFLAGS during compilation
   -L OPT   Add '-OPT' to \$LDFLAGS when using \$LDFLAGS during linking
+  -S       Include all standard C++ library headers for the language standard
 
 An rcfile '${name}rc' controls compilation if present in the same directory as
 PROGRAM, or if present in the current working directory when processing standard
@@ -48,7 +48,7 @@ If compilation is successful, the exit status is that of PROGRAM.
 "
 declare -i e=0 m=0 s=0 S=0 v=0 l=0
 declare -A E=() L=()
-while getopts e:hl:mp:r:sSt:vx:F:L: flag; do
+while getopts e:hl:mp:r:st:vx:F:L:S flag; do
   case $flag in
     e) E[$e]=$OPTARG; ((e+=1))    ;; # To process later; notice 'E' not 'e'
     h) exec echo -ne "$help"      ;; # Stops processing due to exec
@@ -57,12 +57,12 @@ while getopts e:hl:mp:r:sSt:vx:F:L: flag; do
     p) pkg[$OPTARG]="flag -$flag" ;; # Additively record requested package
     r) r=$OPTARG                  ;; # Record requested rcfile, last one wins
     s) s=1                        ;; # To process later
-    S) S=1                        ;; # To process later
     t) T=$OPTARG;                 ;; # To process later; notice 'T' not 't'
     v) ((v+=1))                   ;; # Try -v, -vv, etc. to increase verbosity
     x) X=$OPTARG                  ;; # To process later; notice 'X' not 'x'
     F) CFLAGS="${CFLAGS:+${CFLAGS} }-$OPTARG"    ;; # Space-separated append
     L) LDFLAGS="${LDFLAGS:+${LDFLAGS} }-$OPTARG" ;; # Space-separated append
+    S) S=1                        ;; # To process later
     ?) exit;                      ;;
   esac
 done
@@ -122,6 +122,7 @@ then echo "#line $LINENO \"$0\"" >>"$c"
 fi
 
 # If requested, include all standard C++ library headers
+# Costs over a second of compilation time on every invocation
 if [ $S -gt 0 ]
 then echo "#line $LINENO \"$0\"" >>"$c"
      case "$lang" in
