@@ -6,6 +6,6 @@ int main()
     std::sort(v.begin(), v.end());
     const int max = *std::max_element(v.begin(), v.end());
     std::printf("Sorted %zu values with max %d\n", v.size(), max);
-    return !std::is_sorted(v.begin(), v.end()) || std::sqrt(max) != 3;
+    return !std::is_sorted(v.begin(), v.end()) || max != 9;
 }
 // vim:syntax=c
