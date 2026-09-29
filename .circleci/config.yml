@@ -18,8 +18,6 @@ jobs:
       - run:
           name: Test c99sh
           command: |
-            /usr/bin/gcc --version
-            /usr/bin/g++ --version
             CC=/usr/bin/gcc-14 CXX=/usr/bin/g++-14 ./tests
 
 workflows:

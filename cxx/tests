@@ -3,6 +3,8 @@ set -eux
 # cxxsh test driver relying upon cxxshrc in the same directory
 cd "${0%/*}"
 
+"${CXX-c++}" --version
+
 ./hello
 
 ./heredoc
