@@ -56,7 +56,7 @@ flags, or a source file to compile alongside PROGRAM.  For example:
   using std::vector
   pkg-config sqlite3
   -L/opt/foo/lib -lfoo -lm
-  /opt/bar/util.c
+  /opt/bar/extra_source.c
 
 If compilation is successful, the exit status is that of PROGRAM.
 "
