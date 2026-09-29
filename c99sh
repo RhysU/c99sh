@@ -52,9 +52,9 @@ flags, or a source file to compile alongside PROGRAM.  For example:
 
   // Single-line comment
   -O2 -Wall
-  #include <gsl/gsl_math.h>
+  #include <sqlite3.h>
   using std::vector
-  pkg-config gsl
+  pkg-config sqlite3
   -L/opt/foo/lib -lfoo -lm
   /opt/bar/util.c
 
