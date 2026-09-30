@@ -22,48 +22,56 @@ stderr_pkgs() {
 # Keep README.md Usage section in sync
 help="\
 Usage: ${name} [OPTION]... [--] PROGRAM [PROGRAMOPTION]...
- or:   ${name} [OPTION]... [--] -       [PROGRAMOPTION]...
- or:   ${name} [OPTION]... [--]
+  or:  ${name} [OPTION]... [--] -       [PROGRAMOPTION]...
+  or:  ${name} [OPTION]... [--]
 Compile $lang PROGRAM, or standard input, and run it supplying [PROGRAMOPTION]...
 If compilation is successful, the exit status is that of PROGRAM.
 
-Options:
+Example:
+  echo 'puts(\"Hello, world!\");' | ${name} -ms
+
+Source options:
   -e LINE  Prepend LINE to any input; often used in conjunction with -ms
-  -h       Display this help message
-  -l LIB   Link to the library LIB
   -m       Wrap input in canonical main(argc, argv) declaration; excludes -t
-  -p PKG   Make PKG headers and libraries available to PROGRAM via pkg-config(1)
-  -r RC    Load compilation settings from RC suppressing normal rcfile search
-  -s       Include all standard C, not C++, headers for the language standard
   -t STMT  Append a main(argc, argv) running each STMT in order
-  -v       Increase verbosity; may be supplied multiple times
-  -x EXE   Save the compiled executable as EXE instead of running it
-  -E       Print generated source to standard output instead of compiling
+  -s       Include all standard C, not C++, headers for the language standard
+  -S       Include all standard C++ library headers for the language standard
+
+Build options:
+  -l LIB   Link to the library LIB
+  -p PKG   Make PKG headers and libraries available to PROGRAM via pkg-config(1)
   -F OPT   Add '-OPT' to \$CFLAGS when using \$CFLAGS during compilation
   -L OPT   Add '-OPT' to \$LDFLAGS when using \$LDFLAGS during linking
-  -R       Suppress rcfile loading; equivalent to -r /dev/null
-  -S       Include all standard C++ library headers for the language standard
   -W       Enable and enforce warnings; equivalent to -F Wall -F Werror
 
-An rcfile '${name}rc' controls compilation if present in the same directory as
-PROGRAM, or if present in the current working directory when processing standard
-input.  Otherwise, if it exists, the file ~/.${name}rc controls compilation.
+Output options:
+  -x EXE   Save the compiled executable as EXE instead of running it
+  -E       Print generated source to standard output instead of compiling
+  -v       Increase verbosity; may be supplied multiple times
+  -h       Display this help message
 
-Each non-blank rcfile line must be a // comment, compiler flags, a preprocessor
-directive, a C++ using or namespace directive, a pkg-config request, linker
-flags, or a source, object, or archive file to build alongside PROGRAM.
+Rcfile processing:
+  -r RC    Load compilation settings from RC suppressing normal rcfile search
+  -R       Suppress rcfile loading; equivalent to -r /dev/null
 
-Example rcfile syntax:
+  An rcfile '${name}rc' controls compilation if present in the same directory
+  as PROGRAM, or in the current working directory when processing standard
+  input.  Otherwise, if it exists, the file ~/.${name}rc controls compilation.
 
-  // Single-line comment
-  -O2 -Wall
-  #include <sqlite3.h>
-  using std::vector
-  namespace fs = std::filesystem
-  pkg-config sqlite3
-  -L/foo/lib -lfoo -lm
-  /bar/extra_source.c
-  /bar/libextra.a
+Rcfile syntax:
+  Each non-blank line must be a // comment, compiler flags, a preprocessor
+  directive, a C++ using or namespace directive, a pkg-config request, linker
+  flags, or a source, object, or archive file to build alongside PROGRAM.
+
+    // Single-line comment
+    -O2 -Wall
+    #include <sqlite3.h>
+    using std::vector
+    namespace fs = std::filesystem
+    pkg-config sqlite3
+    -L/foo/lib -lfoo -lm
+    /bar/extra_source.c
+    /bar/libextra.a
 "
 declare -i m=0 s=0 S=0 v=0 E=0
 declare -a e=() l=() t=() x=()
