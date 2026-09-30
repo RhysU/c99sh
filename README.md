@@ -168,7 +168,7 @@ Three lines let `./shebang.c` run as a script and `gcc shebang.c` compile it:
         }
     }
 
-Add `-t` to test valid C source files quickly.  A `#!` line cannot pass `-t`
+Add `-t` to test valid C source files quickly.  A shebang cannot pass `-t`
 reliably because of [argument
 splitting](https://en.wikipedia.org/wiki/Shebang_(Unix)#Argument_splitting),
 but this pattern can:
