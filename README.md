@@ -74,10 +74,10 @@ Usage
 
     Source options:
       -e LINE  Prepend LINE to any input; often used in conjunction with -ms
-      -m       Wrap input in canonical main(argc, argv) declaration; excludes -t
-      -t STMT  Append a main(argc, argv) running each STMT in order
-      -s       Include all standard C, not C++, headers for the language standard
-      -S       Include all standard C++ library headers for the language standard
+      -m       Surround input with main(argc, argv) declaration
+      -t STMT  Follow input with main(argc, argv) containing STMT;
+      -s       Include all standard C, not C++, headers for the language
+      -S       Include all standard C++ library headers for the language
 
     Build options:
       -l LIB   Link to the library LIB
