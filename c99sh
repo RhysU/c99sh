@@ -65,19 +65,19 @@ Example rcfile syntax:
   /bar/libextra.a
 "
 declare -i m=0 s=0 S=0 v=0
-declare -a E=() L=() T=() X=()
+declare -a e=() l=() t=() x=()
 while getopts e:hl:mp:r:st:vx:F:L:RSW flag; do
   case $flag in
-    e) E+=("$OPTARG")             ;; # To process later; notice 'E' not 'e'
+    e) e+=("$OPTARG")             ;; # To process later
     h) exec echo -ne "$help"      ;; # Stops processing due to exec
-    l) L+=("$OPTARG")             ;; # Libraries to be processed later
+    l) l+=("$OPTARG")             ;; # Libraries to be processed later
     m) m=1                        ;; # To process later
     p) pkg[$OPTARG]="flag -$flag" ;; # Additively record requested package
     r) r=$OPTARG                  ;; # Record requested rcfile, last one wins
     s) s=1                        ;; # To process later
-    t) T+=("$OPTARG")             ;; # To process later; notice 'T' not 't'
+    t) t+=("$OPTARG")             ;; # To process later
     v) ((v+=1))                   ;; # Try -v, -vv, etc. to increase verbosity
-    x) X+=("$OPTARG")             ;; # To process later; notice 'X' not 'x'
+    x) x+=("$OPTARG")             ;; # To process later
     F) CFLAGS="${CFLAGS:+${CFLAGS} }-$OPTARG"    ;; # Space-separated append
     L) LDFLAGS="${LDFLAGS:+${LDFLAGS} }-$OPTARG" ;; # Space-separated append
     R) r=/dev/null                ;; # Equivalent to -r /dev/null
@@ -92,7 +92,7 @@ shift $((OPTIND-1))
 [ $v -ge 3 ] && set -x
 
 # Flags -m and -t each emit a main
-[[ $m -gt 0 && ${#T[@]} -gt 0 ]] && fatal $LINENO "error: -m excludes -t"
+[[ $m -gt 0 && ${#t[@]} -gt 0 ]] && fatal $LINENO "error: -m excludes -t"
 
 # Process standard input on absent or '-' filename otherwise snarf $1
 f="<stdin>"; d="."
@@ -106,9 +106,9 @@ then if   [ "$1" != "-" ]
      shift 1
 fi
 
-c=$(mktemp "${TMPDIR-/tmp}/${lang}sh.XXXXXX") # Mangled source for compiling
-x=$(mktemp "${TMPDIR-/tmp}/${lang}sh.XXXXXX") # Compiled binary to be run
-trap 'rm -f "$c" "$x"' EXIT                  # Automatic cleanup on exit
+c=$(mktemp "${TMPDIR-/tmp}/${lang}sh.XXXXXX")   # Mangled source for compiling
+exe=$(mktemp "${TMPDIR-/tmp}/${lang}sh.XXXXXX") # Compiled binary to be run
+trap 'rm -f "$c" "$exe"' EXIT                    # Automatic cleanup on exit
 
 # Guards skip headers C11 permits omitting via __STDC_NO_*__ macros
 declare -Ar guard=( [complex.h]=__STDC_NO_COMPLEX__
@@ -239,9 +239,9 @@ emit_main_close() {
 [[ $m -gt 0 ]] && emit_main_open
 
 # If requested, emit one or more statements possibly inside main
-if [ ${#E[@]} -gt 0 ]
+if [ ${#e[@]} -gt 0 ]
 then echo '#line 1 "<-e>"'     >> "$c"
-     printf '%s\n' "${E[@]}" >> "$c"
+     printf '%s\n' "${e[@]}" >> "$c"
 fi
 
 # Prepare source from standard input for "interpretation" by the compiler.
@@ -261,31 +261,31 @@ fi
 [[ $m -gt 0 ]] && emit_main_close
 
 # If requested, append a main function running the given statements
-if [ ${#T[@]} -gt 0 ]
+if [ ${#t[@]} -gt 0 ]
 then emit_main_open
      echo '#line 1 "<-t>"'     >> "$c"
-     printf '%s;\n' "${T[@]}" >> "$c"
+     printf '%s;\n' "${t[@]}" >> "$c"
      emit_main_close
 fi
 
 # Add libraries from command line options
-[ ${#L[@]} -gt 0 ] && logic+=("${L[@]/#/-l}")
+[ ${#l[@]} -gt 0 ] && logic+=("${l[@]/#/-l}")
 
 # Compile the generated source with appropriate verbosity
 [ $v -ge 2 ] && cat "$c" 1>&2
 [ $v -ge 1 ] && set -x
 case "$lang" in
   c11|C11)
-    "${CC-cc}"   -std=gnu11   -o "$x" "${flags[@]}" -x c   "${logic[@]}" 1>&2
+    "${CC-cc}"   -std=gnu11   -o "$exe" "${flags[@]}" -x c   "${logic[@]}" 1>&2
     ;;
   c23|C23)
-    "${CC-cc}"   -std=gnu23   -o "$x" "${flags[@]}" -x c   "${logic[@]}" 1>&2
+    "${CC-cc}"   -std=gnu23   -o "$exe" "${flags[@]}" -x c   "${logic[@]}" 1>&2
     ;;
   c99|C99)
-    "${CC-cc}"   -std=gnu99   -o "$x" "${flags[@]}" -x c   "${logic[@]}" 1>&2
+    "${CC-cc}"   -std=gnu99   -o "$exe" "${flags[@]}" -x c   "${logic[@]}" 1>&2
     ;;
   cxx|CXX)
-    "${CXX-c++}" -std=gnu++17 -o "$x" "${flags[@]}" -x c++ "${logic[@]}" 1>&2
+    "${CXX-c++}" -std=gnu++17 -o "$exe" "${flags[@]}" -x c++ "${logic[@]}" 1>&2
     ;;
   *)
     fatal $LINENO "error: unrecognized language prefix - $lang"
@@ -293,7 +293,7 @@ case "$lang" in
 esac
 
 # Either save or execute the binary with any remaining arguments
-if   [ ${#X[@]} -gt 0 ]
-then for o in "${X[@]}"; do cp "$x" "$o"; done
-else "$x" "$@"
+if   [ ${#x[@]} -gt 0 ]
+then for o in "${x[@]}"; do cp "$exe" "$o"; done
+else "$exe" "$@"
 fi
