@@ -25,6 +25,7 @@ Usage: ${name} [OPTION]... [--] PROGRAM [PROGRAMOPTION]...
  or:   ${name} [OPTION]... [--] -       [PROGRAMOPTION]...
  or:   ${name} [OPTION]... [--]
 Compile $lang PROGRAM, or standard input, and run it supplying [PROGRAMOPTION]...
+If compilation is successful, the exit status is that of PROGRAM.
 
 Options:
   -e LINE  Prepends LINE to any input; often used in conjunction with -ms
@@ -50,7 +51,8 @@ input.  Otherwise, if it exists, the file ~/.${name}rc controls compilation.
 Each non-blank rcfile line must be a // comment, compiler flags, a preprocessor
 directive, a C++ using or namespace directive, a pkg-config request, linker
 flags, or a source, object, or archive file to build alongside PROGRAM.
-For example:
+
+Example rcfile syntax:
 
   // Single-line comment
   -O2 -Wall
@@ -61,8 +63,6 @@ For example:
   -L/foo/lib -lfoo -lm
   /bar/extra_source.c
   /bar/libextra.a
-
-If compilation is successful, the exit status is that of PROGRAM.
 "
 declare -i e=0 m=0 s=0 S=0 v=0 l=0
 declare -A E=() L=()

@@ -68,6 +68,7 @@ Usage
      or:   c99sh [OPTION]... [--] -       [PROGRAMOPTION]...
      or:   c99sh [OPTION]... [--]
     Compile c99 PROGRAM, or standard input, and run it supplying [PROGRAMOPTION]...
+    If compilation is successful, the exit status is that of PROGRAM.
 
     Options:
       -e LINE  Prepends LINE to any input; often used in conjunction with -ms
@@ -93,7 +94,8 @@ Usage
     Each non-blank rcfile line must be a // comment, compiler flags, a preprocessor
     directive, a C++ using or namespace directive, a pkg-config request, linker
     flags, or a source, object, or archive file to build alongside PROGRAM.
-    For example:
+
+    Example rcfile syntax:
 
       // Single-line comment
       -O2 -Wall
@@ -104,8 +106,6 @@ Usage
       -L/foo/lib -lfoo -lm
       /bar/extra_source.c
       /bar/libextra.a
-
-    If compilation is successful, the exit status is that of PROGRAM.
 
 Rcfiles
 -------
