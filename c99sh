@@ -238,7 +238,7 @@ emit_main_close() {
 # If requested, emit one or more statements possibly inside main
 [ $e -gt 0 ] && echo '#line 1 "<-e>"' >> "$c"
 for ((i = 0; i < e; ++i)); do
-    echo "${E[$i]}" >> "$c"
+    printf '%s\n' "${E[$i]}" >> "$c"
 done
 
 # Prepare source from standard input for "interpretation" by the compiler.

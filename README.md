@@ -58,8 +58,6 @@ Usually, `-sm` appears alongside `-e`:
     }
     HERE
 
-Beware quote escaping for `-e` could use some `printf` love.  Patches welcome.
-
 Usage
 -----
 
