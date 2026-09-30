@@ -19,7 +19,9 @@ Overview
 --------
 
 `c99sh` shortens the edit-compile-run loop when prototyping by "interpreting"
-single C99, C11, C23, and C++ files.  It is shebang-friendly and reads rcfiles.
+single C99, C11, C23, and C++ files.  It is
+[shebang](https://en.wikipedia.org/wiki/Shebang_(Unix))-friendly and reads
+rcfiles.
 
 For example, with this `~/.c99shrc`
 
