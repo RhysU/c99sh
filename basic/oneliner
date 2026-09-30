@@ -6,6 +6,9 @@ set -o pipefail
 ../c99sh -e 'int main() {}' </dev/null
 ../c99sh -se 'int main() {}' </dev/null
 
+# Unknown options should fail
+! ../c99sh -Q </dev/null || exit 1
+
 # Multiple -e should all be emitted
 ../c99sh -e 'int main()' -e '{}' </dev/null
 
