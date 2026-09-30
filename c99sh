@@ -150,7 +150,7 @@ then echo "#line $LINENO \"$0\"" >>"$c"
         fatal $LINENO "error: -S not applicable to language prefix - $lang" ;;
      # Excludes the C++17 deprecated <codecvt> and <strstream>
      cxx|CXX) include algorithm any array atomic bitset chrono complex    \
-                      condition_variable deque exception execution        \
+                      condition_variable deque exception                  \
                       filesystem forward_list fstream functional future   \
                       initializer_list iomanip ios iosfwd iostream        \
                       istream iterator limits list locale map memory      \
