@@ -31,12 +31,12 @@ echo 'printf(MACRO);' | ../c99sh -ms '-FDMACRO="Salut\n"'
 )
 
 # Using -L causes the option to appear thereby *breaking* this example
-! ../c99sh -mse 'printf("First test of -L\n");' -Llnonexistent </dev/null
+! ../c99sh -m -e 'return 0;' -LWl,--no-such-flag </dev/null || exit 1
 
 # Further, using -L appends to LDFLAGS thereby *breaking* this example
 (
     export LDFLAGS=-lnonexistent
-    ! ../c99sh -mse 'printf("Third test of -L\n");' -Llm </dev/null
+    ! ../c99sh -m -e 'return 0;' -LWl,--as-needed </dev/null || exit 1
 )
 
 # Flag -m excludes -t
