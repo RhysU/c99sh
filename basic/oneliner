@@ -18,6 +18,9 @@ set -o pipefail
 
 ../c99sh -mse 'printf("Hello from 1-liner\n");' </dev/null
 
+# Errors in -e lines should cite -e, not c99sh
+(../c99sh -ms -e 'int x = ;' </dev/null 2>&1 || true) | grep -q '^<-e>:1:'
+
 # Using -F causes the option to appear
 echo 'printf(MACRO);' | ../c99sh -ms '-FDMACRO="Salut\n"'
 
