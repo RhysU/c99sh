@@ -236,6 +236,7 @@ emit_main_close() {
 [[ $m -gt 0 ]] && emit_main_open
 
 # If requested, emit one or more statements possibly inside main
+[ $e -gt 0 ] && echo '#line 1 "<-e>"' >> "$c"
 for ((i = 0; i < e; ++i)); do
     echo "${E[$i]}" >> "$c"
 done
