@@ -78,7 +78,7 @@ Usage
       -s       Include all standard C, not C++, headers for the language standard
       -t STMT  Append a main(argc, argv) running each STMT in order
       -v       Increase verbosity; may be supplied multiple times
-      -x EXE   Save a successfully compiled executable as EXE instead of running it
+      -x EXE   Save the compiled executable as EXE instead of running it
       -F OPT   Add '-OPT' to $CFLAGS when using $CFLAGS during compilation
       -L OPT   Add '-OPT' to $LDFLAGS when using $LDFLAGS during linking
       -R       Suppress rcfile loading; equivalent to -r /dev/null

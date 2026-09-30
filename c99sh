@@ -37,7 +37,7 @@ Options:
   -s       Include all standard C, not C++, headers for the language standard
   -t STMT  Append a main(argc, argv) running each STMT in order
   -v       Increase verbosity; may be supplied multiple times
-  -x EXE   Save a successfully compiled executable as EXE instead of running it
+  -x EXE   Save the compiled executable as EXE instead of running it
   -F OPT   Add '-OPT' to \$CFLAGS when using \$CFLAGS during compilation
   -L OPT   Add '-OPT' to \$LDFLAGS when using \$LDFLAGS during linking
   -R       Suppress rcfile loading; equivalent to -r /dev/null
@@ -65,7 +65,7 @@ Example rcfile syntax:
   /bar/libextra.a
 "
 declare -i m=0 s=0 S=0 v=0
-declare -a E=() L=() T=()
+declare -a E=() L=() T=() X=()
 while getopts e:hl:mp:r:st:vx:F:L:RSW flag; do
   case $flag in
     e) E+=("$OPTARG")             ;; # To process later; notice 'E' not 'e'
@@ -77,7 +77,7 @@ while getopts e:hl:mp:r:st:vx:F:L:RSW flag; do
     s) s=1                        ;; # To process later
     t) T+=("$OPTARG")             ;; # To process later; notice 'T' not 't'
     v) ((v+=1))                   ;; # Try -v, -vv, etc. to increase verbosity
-    x) X=$OPTARG                  ;; # To process later; notice 'X' not 'x'
+    x) X+=("$OPTARG")             ;; # To process later; notice 'X' not 'x'
     F) CFLAGS="${CFLAGS:+${CFLAGS} }-$OPTARG"    ;; # Space-separated append
     L) LDFLAGS="${LDFLAGS:+${LDFLAGS} }-$OPTARG" ;; # Space-separated append
     R) r=/dev/null                ;; # Equivalent to -r /dev/null
@@ -293,7 +293,7 @@ case "$lang" in
 esac
 
 # Either save or execute the binary with any remaining arguments
-if   [ -n "${X-}" ]
-then cp "$x" "$X"
+if   [ ${#X[@]} -gt 0 ]
+then for o in "${X[@]}"; do cp "$x" "$o"; done
 else "$x" "$@"
 fi
