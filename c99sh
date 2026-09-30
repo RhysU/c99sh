@@ -31,7 +31,7 @@ Options:
   -e LINE  Prepends LINE to any input; often used in conjunction with -ms
   -h       Display this help message
   -l LIB   Link to the library LIB
-  -m       Wrap input in canonical main(argc, argv) declaration
+  -m       Wrap input in canonical main(argc, argv) declaration; excludes -t
   -p PKG   Make PKG headers and libraries available to PROGRAM via pkg-config(1)
   -r RC    Load compilation settings from RC suppressing normal rcfile search
   -s       Include all standard C, not C++, headers for the language standard
@@ -90,6 +90,9 @@ shift $((OPTIND-1))
 
 # Providing -vvv is maximally verbose
 [ $v -ge 3 ] && set -x
+
+# Flags -m and -t each emit a main
+[[ $m -gt 0 && -n ${T-} ]] && fatal $LINENO "error: -m excludes -t"
 
 # Process standard input on absent or '-' filename otherwise snarf $1
 f="<stdin>"; d="."

@@ -74,7 +74,7 @@ Usage
       -e LINE  Prepends LINE to any input; often used in conjunction with -ms
       -h       Display this help message
       -l LIB   Link to the library LIB
-      -m       Wrap input in canonical main(argc, argv) declaration
+      -m       Wrap input in canonical main(argc, argv) declaration; excludes -t
       -p PKG   Make PKG headers and libraries available to PROGRAM via pkg-config(1)
       -r RC    Load compilation settings from RC suppressing normal rcfile search
       -s       Include all standard C, not C++, headers for the language standard
