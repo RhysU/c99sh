@@ -39,6 +39,9 @@ echo 'printf(MACRO);' | ../c99sh -ms '-FDMACRO="Salut\n"'
     ! ../c99sh -mse 'printf("Third test of -L\n");' -Llm </dev/null
 )
 
+# Flag -m excludes -t
+(../c99sh -m -t 0 </dev/null 2>&1 || true) | grep -q 'error: -m excludes -t'
+
 ../c99sh -mse 'int start = 3;' <<HERE
 return start == 3 ? 0 : 1;
 HERE
