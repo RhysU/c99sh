@@ -40,17 +40,18 @@ command. Check out `c99sh -h` for all the command line options you might use. In
 particular, for simple tasks you might find that the command line options in
 conjunction with HERE documents can accomplish many things.  For example,
 
-    $ ./c99sh -sm <<HERE
+    $ c99sh -ms <<HERE
     puts("Hello, world!");
     HERE
 
-One or more lines can be included using `-e`:
+One or more lines can be included using `-e`.  Unlike Perl's `-e`, standard
+input is still read:
 
-    $ ./c99sh -e 'int main()' -e '{}'
+    $ c99sh -e 'int main()' -e '{}' </dev/null
 
-Usually, `-sm` appears alongside `-e`:
+Usually, `-ms` appears alongside `-e`:
 
-    $ ../c99sh -e 'int start = 3;' -sm <<HERE
+    $ c99sh -e 'int start = 3;' -ms <<HERE
     if (start == 3) {
         printf("Hello from 1-liner\n");
     } else {
@@ -69,7 +70,7 @@ Usage
     If compilation is successful, the exit status is that of PROGRAM.
 
     Options:
-      -e LINE  Prepends LINE to any input; often used in conjunction with -ms
+      -e LINE  Prepend LINE to any input; often used in conjunction with -ms
       -h       Display this help message
       -l LIB   Link to the library LIB
       -m       Wrap input in canonical main(argc, argv) declaration; excludes -t
