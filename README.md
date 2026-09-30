@@ -80,6 +80,7 @@ Usage
       -t STMT  Append a main(argc, argv) running each STMT in order
       -v       Increase verbosity; may be supplied multiple times
       -x EXE   Save the compiled executable as EXE instead of running it
+      -E       Print generated source to standard output instead of compiling
       -F OPT   Add '-OPT' to $CFLAGS when using $CFLAGS during compilation
       -L OPT   Add '-OPT' to $LDFLAGS when using $LDFLAGS during linking
       -R       Suppress rcfile loading; equivalent to -r /dev/null
