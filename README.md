@@ -76,7 +76,7 @@ Usage
       -p PKG   Make PKG headers and libraries available to PROGRAM via pkg-config(1)
       -r RC    Load compilation settings from RC suppressing normal rcfile search
       -s       Include all standard C, not C++, headers for the language standard
-      -t STMT  Append a main(argc, argv) implementation running statement STMT
+      -t STMT  Append a main(argc, argv) running each STMT in order
       -v       Increase verbosity; may be supplied multiple times
       -x EXE   Save a successfully compiled executable as EXE instead of running it
       -F OPT   Add '-OPT' to $CFLAGS when using $CFLAGS during compilation
