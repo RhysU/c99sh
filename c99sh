@@ -28,7 +28,7 @@ Compile $lang PROGRAM, or standard input, and run it supplying [PROGRAMOPTION]..
 If compilation is successful, the exit status is that of PROGRAM.
 
 Options:
-  -e LINE  Prepends LINE to any input; often used in conjunction with -ms
+  -e LINE  Prepend LINE to any input; often used in conjunction with -ms
   -h       Display this help message
   -l LIB   Link to the library LIB
   -m       Wrap input in canonical main(argc, argv) declaration; excludes -t
