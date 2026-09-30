@@ -41,6 +41,13 @@ echo 'printf(MACRO);' | ../c99sh -ms '-FDMACRO="Salut\n"'
 
 # Flag -m excludes -t
 (../c99sh -m -t 0 </dev/null 2>&1 || true) | grep -q 'error: -m excludes -t'
+(../c99sh -m -t 0 -t 0 </dev/null 2>&1 || true) | grep -q 'error: -m excludes -t'
+
+# Flag -t should run each statement in order given
+test "$(../c99sh -t 'puts("a")' -t 'puts("b")' </dev/null)" = "$(printf 'a\nb')"
+
+# Errors in -t statements should cite -t, not c99sh
+(../c99sh -t 'int x = ' </dev/null 2>&1 || true) | grep -q '^<-t>:1:'
 
 ../c99sh -mse 'int start = 3;' <<HERE
 return start == 3 ? 0 : 1;

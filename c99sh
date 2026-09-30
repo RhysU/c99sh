@@ -35,7 +35,7 @@ Options:
   -p PKG   Make PKG headers and libraries available to PROGRAM via pkg-config(1)
   -r RC    Load compilation settings from RC suppressing normal rcfile search
   -s       Include all standard C, not C++, headers for the language standard
-  -t STMT  Append a main(argc, argv) implementation running statement STMT
+  -t STMT  Append a main(argc, argv) running each STMT in order
   -v       Increase verbosity; may be supplied multiple times
   -x EXE   Save a successfully compiled executable as EXE instead of running it
   -F OPT   Add '-OPT' to \$CFLAGS when using \$CFLAGS during compilation
@@ -65,7 +65,7 @@ Example rcfile syntax:
   /bar/libextra.a
 "
 declare -i m=0 s=0 S=0 v=0
-declare -a E=() L=()
+declare -a E=() L=() T=()
 while getopts e:hl:mp:r:st:vx:F:L:RSW flag; do
   case $flag in
     e) E+=("$OPTARG")             ;; # To process later; notice 'E' not 'e'
@@ -75,7 +75,7 @@ while getopts e:hl:mp:r:st:vx:F:L:RSW flag; do
     p) pkg[$OPTARG]="flag -$flag" ;; # Additively record requested package
     r) r=$OPTARG                  ;; # Record requested rcfile, last one wins
     s) s=1                        ;; # To process later
-    t) T=$OPTARG                  ;; # To process later; notice 'T' not 't'
+    t) T+=("$OPTARG")             ;; # To process later; notice 'T' not 't'
     v) ((v+=1))                   ;; # Try -v, -vv, etc. to increase verbosity
     x) X=$OPTARG                  ;; # To process later; notice 'X' not 'x'
     F) CFLAGS="${CFLAGS:+${CFLAGS} }-$OPTARG"    ;; # Space-separated append
@@ -92,7 +92,7 @@ shift $((OPTIND-1))
 [ $v -ge 3 ] && set -x
 
 # Flags -m and -t each emit a main
-[[ $m -gt 0 && -n ${T-} ]] && fatal $LINENO "error: -m excludes -t"
+[[ $m -gt 0 && ${#T[@]} -gt 0 ]] && fatal $LINENO "error: -m excludes -t"
 
 # Process standard input on absent or '-' filename otherwise snarf $1
 f="<stdin>"; d="."
@@ -260,10 +260,11 @@ fi
 # If requested, close main function about entire input
 [[ $m -gt 0 ]] && emit_main_close
 
-# If requested, append a main function containing the given statement
-if [ -n "${T-}" ]
+# If requested, append a main function running the given statements
+if [ ${#T[@]} -gt 0 ]
 then emit_main_open
-     echo "$T;" >> "$c"
+     echo '#line 1 "<-t>"'     >> "$c"
+     printf '%s;\n' "${T[@]}" >> "$c"
      emit_main_close
 fi
 
