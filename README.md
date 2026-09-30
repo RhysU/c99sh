@@ -1,31 +1,32 @@
 c99sh
 =====
 
+[![Build Status](https://circleci.com/gh/RhysU/c99sh.svg?style=shield)](https://app.circleci.com/pipelines/github/RhysU/c99sh)
+
 <!-- vim-markdown-toc GFM -->
-* [Basic Idea](#basic-idea)
-* [Usage](#usage)
-* [Rcfiles](#rcfiles)
-* [Shebang Tricks](#shebang-tricks)
+* [Overview](#overview)
+* [Simple Tasks](#simple-tasks)
+* [Complicated Tasks](#complicated-tasks)
+* [Reference](#reference)
+* [Compiling Source with a Shebang](#compiling-source-with-a-shebang)
+* [C11 and C23](#c11-and-c23)
 * [C++](#c)
-* [C11](#c11)
-* [C23](#c23)
 * [Credits](#credits)
 
 <!-- vim-markdown-toc -->
 
-Basic Idea
-----------
+Overview
+--------
 
-A shebang-friendly script for "interpreting" single C99, C11, and C++ files,
-including rcfile support.  [![Build
-Status](https://circleci.com/gh/RhysU/c99sh.svg?style=shield)](https://app.circleci.com/pipelines/github/RhysU/c99sh)
+`c99sh` shortens the edit-compile-run loop when prototyping by "interpreting"
+single C99, C11, C23, and C++ files.  It is shebang-friendly and reads rcfiles.
 
-For example, installing this `~/.c99shrc` rcfile
+For example, with this `~/.c99shrc`
 
     -Wall -g -O2
     #include <stdio.h>
 
-permits executing [hello](basic/hello) containing
+and [c99sh](c99sh) in your path, [hello](basic/hello) runs as expected:
 
     #!/usr/bin/env c99sh
     int main()
@@ -33,34 +34,66 @@ permits executing [hello](basic/hello) containing
         puts("Hello, world!");
     }
 
-to produce the output one expects provided [c99sh](c99sh) is in the path. You
-may also run `c99sh foo.c` to execute some `foo.c` lacking the shebang line. Try
-`c99sh -v foo.c` if you encounter trouble and want to see the compilation
-command. Check out `c99sh -h` for all the command line options you might use. In
-particular, for simple tasks you might find that the command line options in
-conjunction with HERE documents can accomplish many things.  For example,
+Simple Tasks
+------------
+
+Combine options with HERE documents:
 
     $ c99sh -ms <<HERE
     puts("Hello, world!");
     HERE
 
-One or more lines can be included using `-e`.  Unlike Perl's `-e`, standard
-input is still read:
+Add lines with `-e`.  Unlike Perl's `-e`, standard input is still read:
 
     $ c99sh -e 'int main()' -e '{}' </dev/null
 
-Usually, `-ms` appears alongside `-e`:
+Run `c99sh foo.c` when `foo.c` has no shebang line.  Add `-v` to see the
+compilation command.
 
-    $ c99sh -e 'int start = 3;' -ms <<HERE
-    if (start == 3) {
-        printf("Hello from 1-liner\n");
-    } else {
-        return 1;
+Complicated Tasks
+-----------------
+
+Rcfiles simplify using libraries with richer data structures.
+[c99shrc.example](c99shrc.example) enables
+[GSL](http://www.gnu.org/software/gsl/),
+[GLib](https://developer.gnome.org/glib/), and [SQLite](http://www.sqlite.org/)
+via [pkg-config](http://www.freedesktop.org/wiki/Software/pkg-config/).
+
+One-off scripts can move directly into C ABI code, skipping a
+{Python,Octave,R}-to-C translation and debugging phase.  Compare the [Octave
+version](gsl/nozzle_match.m) of some simple logic with the [c99sh
+version](gsl/nozzle_match), which needs only a few [one-time
+additions](gsl/c99shrc) to your `~/.c99shrc`.
+
+A more entertaining [example](openmp/pi) computes π by OpenMP-enabled Monte
+Carlo, screaming like a banshee on all your cores.  Its
+[c99shrc](openmp/c99shrc) adds `-fopenmp` and `omp.h`:
+
+    #!/usr/bin/env c99sh
+
+    int main(int argc, char *argv[])
+    {
+        long long niter = argc > 1 ? atof(argv[1]) : 100000;
+        long long count = 0;
+
+        #pragma omp parallel
+        {
+            unsigned int seed = omp_get_thread_num();
+
+            #pragma omp for reduction(+: count) schedule(static)
+            for (long long i = 0; i < niter; ++i) {
+                const double x = rand_r(&seed) / (double) RAND_MAX;
+                const double y = rand_r(&seed) / (double) RAND_MAX;
+                count += sqrt(x*x + y*y) < 1;
+            }
+
+        }
+
+        printf("%lld: %g\n", niter, M_PI - 4*(count / (double) niter));
     }
-    HERE
 
-Usage
------
+Reference
+---------
 
     $ c99sh -h
     Usage: c99sh [OPTION]... [--] PROGRAM [PROGRAMOPTION]...
@@ -115,63 +148,10 @@ Usage
         /bar/extra_source.c
         /bar/libextra.a
 
-Rcfiles
--------
+Compiling Source with a Shebang
+-------------------------------
 
-Rcfiles can supply compilation and linking flags, preprocessor directives
-like `#include`, and
-[pkg-config](http://www.freedesktop.org/wiki/Software/pkg-config/) directives to
-simplify library usage. A `c99shrc` located in the same directory as the
-interpreted source will be used. Otherwise a `~/.c99shrc` is processed if
-available. See [c99shrc.example](c99shrc.example) for an extended rcfile
-enabling [GSL](http://www.gnu.org/software/gsl/),
-[GLib](https://developer.gnome.org/glib/), and [SQLite](http://www.sqlite.org/)
-capabilities.  Rcfiles ease accessing libraries with higher-level
-data structures.
-
-A more entertaining example is an [OpenMP](http://openmp.org/wp/)-enabled Monte
-Carlo computation of π screaming like a banshee on all your cores
-([c99shrc](openmp/c99shrc), [source](openmp/pi)):
-
-    #!/usr/bin/env c99sh
-
-    int main(int argc, char *argv[])
-    {
-        long long niter = argc > 1 ? atof(argv[1]) : 100000;
-        long long count = 0;
-
-        #pragma omp parallel
-        {
-            unsigned int seed = omp_get_thread_num();
-
-            #pragma omp for reduction(+: count) schedule(static)
-            for (long long i = 0; i < niter; ++i) {
-                const double x = rand_r(&seed) / (double) RAND_MAX;
-                const double y = rand_r(&seed) / (double) RAND_MAX;
-                count += sqrt(x*x + y*y) < 1;
-            }
-
-        }
-
-        printf("%lld: %g\n", niter, M_PI - 4*(count / (double) niter));
-    }
-
-Take that, [GIL](http://en.wikipedia.org/wiki/Global_Interpreter_Lock).
-
-Kidding aside, the speedup in the edit-compile-run loop can be handy during
-prototyping or analysis.  It is nice when useful one-off scripts can be moved
-directly into C ABI code instead of requiring an additional
-{Python,Octave,R}-to-C translation and debugging phase.  For example, compare
-the [Octave version](gsl/nozzle_match.m) of some simple logic with the
-[equivalent c99sh-based version](gsl/nozzle_match) requiring only a few
-[one-time additions](gsl/c99shrc) to your `~/.c99shrc`.
-
-Shebang Tricks
---------------
-
-Dual shebang/compiled support, that is a source file that can be both
-interpreted via `./shebang.c` and compiled via `gcc shebang.c`, can most
-succinctly be achieved as follows:
+Three lines let `./shebang.c` run as a script and `gcc shebang.c` compile it:
 
     #if 0
     exec c99sh "$0" "$@"
@@ -186,8 +166,7 @@ succinctly be achieved as follows:
         }
     }
 
-This dual shebang approach permits quick testing/iteration on valid
-C source files using the `-t` option:
+Add `-t` to test valid C source files quickly:
 
     #if 0
     exec c99sh -t 'test()' "$0" "$@"
@@ -208,58 +187,41 @@ C source files using the `-t` option:
 Testing in this manner resembles how folks use Python's `__main__` inside
 libraries.
 
+C11 and C23
+-----------
+
+C11 and C23 can be used via symlinks named [c11sh](c11sh) and [c23sh](c23sh)
+with rcfiles like `c11shrc` and `c23shrc`.
+
 C++
 ---
 
-As nearly the entire C99-oriented implementation works for C++, by invoking
-[c99sh](c99sh) through either a copy or symlink named [cxxsh](cxxsh), you can
-write C++-based logic.  The relevant rcfiles are named like `cxxshrc` in
-this case and they support directives like `using namespace std` and `namespace
-fb = foo::bar`.  See [cxx/hello](cxx/hello) and [cxx/cxxshrc](cxx/cxxshrc) for a
-hello world C++ example.  See [cxx/shebang.cpp](cxx/shebang.cpp) and
-[cxx/quicktest.cpp](cxx/quicktest.cpp) for C++ dual shebang/compiled idioms.
+Invoke [c99sh](c99sh) through a copy or symlink named [cxxsh](cxxsh) to write
+C++.  Rcfiles are then named like `cxxshrc` and also accept directives like
+`using namespace std` and `namespace fb = foo::bar`.  See
+[cxx/hello](cxx/hello) with [cxx/cxxshrc](cxx/cxxshrc) for hello world.  See
+[cxx/shebang.cpp](cxx/shebang.cpp) and [cxx/quicktest.cpp](cxx/quicktest.cpp)
+for dual shebang/compiled idioms.
 
-One nice use case is hacking atop [Eigen](http://eigen.tuxfamily.org/) since it
-provides pkg-config support. That is, `cxxsh -p eigen3 myprogram` builds and
-runs a one-off, Eigen-based program.  With the right `cxxshrc`, such a program
-can be turned into a script.  Though, you will likely notice the compilation
-overhead much moreso with C++ than C99.  That said, for repeated invocation an
-output binary can be saved with the `-x` option should repeated recompilation be
-prohibitively expensive.
-
-C11
----
-
-C11 can be used via a symlink named [c11sh](c11sh) with rcfiles like
-`c11shrc`.
-
-C23
----
-
-C23 can be used via a symlink named [c23sh](c23sh) with rcfiles like
-`c23shrc`.
+[Eigen](http://eigen.tuxfamily.org/) supports pkg-config, so
+`cxxsh -p eigen3 myprogram` builds and runs a one-off Eigen program.  The
+right `cxxshrc` turns it into a script.  C++ compiles noticeably slower than C.
+Save the binary with `-x` when recompiling costs too much.
 
 Credits
 -------
 
-The idea for `c99sh` came from [21st Century
-C](http://shop.oreilly.com/product/0636920025108.do)'s section "Compiling C
-Programs via Here Document" ([available
-online](http://cdn.oreilly.com/oreilly/booksamplers/9781449327149_sampler.pdf))
-by [Ben Klemens](http://ben.klemens.org/). Additionally, I wrote it somewhat in
-reaction to browsing the C++-ish work by
-[elsamuko/cppsh](https://github.com/elsamuko/cppsh).
+`c99sh` grew from "Compiling C Programs via Here Document" in [Ben
+Klemens](http://ben.klemens.org/)'s [21st Century
+C](http://shop.oreilly.com/product/0636920025108.do).  That section is
+[available
+online](http://cdn.oreilly.com/oreilly/booksamplers/9781449327149_sampler.pdf).
+[elsamuko/cppsh](https://github.com/elsamuko/cppsh) also prompted it.
 
-The dual shebang/compiled approach was suggested by
 [mcandre](http://github.com/mcandre) and
-[jtsagata](http://github.com/jtsagata).  Thank you both for pushing on the
-idea, as I did not think it could be done in three clean lines.
+[jtsagata](http://github.com/jtsagata) suggested compiling source with a
+shebang.  Thank you both.  I did not think three clean lines could do it.
 
-The one line execution similar to Perl's -e was done by
-[mattapiroglu](http://github.com/mattapiroglu).
-
-The `-l` command line option was contributed by
-[flipcoder](https://github.com/flipcoder).
-
-The `-F` and `-L` command line options were contributed by
-[ProducerMatt](https://github.com/ProducerMatt).
+[mattapiroglu](http://github.com/mattapiroglu) added `-e`.
+[flipcoder](https://github.com/flipcoder) added `-l`.
+[ProducerMatt](https://github.com/ProducerMatt) added `-F` and `-L`.
