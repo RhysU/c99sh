@@ -62,3 +62,6 @@ HERE
 ../c99sh -ms -e '#define w1 "Hello"' \
              -e '#define w2 "World"' \
              -e 'printf("%s %s\n", w1, w2);' </dev/null
+
+# Lines resembling echo options should reach the compiler
+! ../c99sh -m -e '-n' -e 'return 0;' </dev/null || exit 1
