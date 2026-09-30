@@ -82,3 +82,8 @@ HERE
 # Flag -l should link every library given
 ../c99sh -ms -l m -l c <<<'return sqrt(4.0) == 2.0 ? 0 : 1;'
 ! ../c99sh -m -l m -l nonexistent </dev/null || exit 1
+
+# Flag -E should print compilable source instead of compiling
+../c99sh -E -ms -e 'puts("E");' </dev/null | grep -q '^puts("E");$'
+test "$(../c99sh -E -ms -e 'puts("E");' </dev/null \
+        | "${CC-cc}" -std=gnu99 -x c -o E.out - && ./E.out; rm -f E.out)" = E
