@@ -68,3 +68,7 @@ HERE
 
 # Lines resembling echo options should reach the compiler
 ! ../c99sh -m -e '-n' -e 'return 0;' </dev/null || exit 1
+
+# Flag -l should link every library given
+../c99sh -ms -l m -l c <<<'return sqrt(4.0) == 2.0 ? 0 : 1;'
+! ../c99sh -m -l m -l nonexistent </dev/null || exit 1

@@ -64,18 +64,18 @@ Example rcfile syntax:
   /bar/extra_source.c
   /bar/libextra.a
 "
-declare -i e=0 m=0 s=0 S=0 v=0 l=0
-declare -A E=() L=()
+declare -i m=0 s=0 S=0 v=0
+declare -a E=() L=()
 while getopts e:hl:mp:r:st:vx:F:L:RSW flag; do
   case $flag in
-    e) E[$e]=$OPTARG; ((e+=1))    ;; # To process later; notice 'E' not 'e'
+    e) E+=("$OPTARG")             ;; # To process later; notice 'E' not 'e'
     h) exec echo -ne "$help"      ;; # Stops processing due to exec
-    l) L[$l]=$OPTARG; ((l+=1))    ;; # Libraries to be processed later
+    l) L+=("$OPTARG")             ;; # Libraries to be processed later
     m) m=1                        ;; # To process later
     p) pkg[$OPTARG]="flag -$flag" ;; # Additively record requested package
     r) r=$OPTARG                  ;; # Record requested rcfile, last one wins
     s) s=1                        ;; # To process later
-    t) T=$OPTARG;                 ;; # To process later; notice 'T' not 't'
+    t) T=$OPTARG                  ;; # To process later; notice 'T' not 't'
     v) ((v+=1))                   ;; # Try -v, -vv, etc. to increase verbosity
     x) X=$OPTARG                  ;; # To process later; notice 'X' not 'x'
     F) CFLAGS="${CFLAGS:+${CFLAGS} }-$OPTARG"    ;; # Space-separated append
@@ -236,10 +236,10 @@ emit_main_close() {
 [[ $m -gt 0 ]] && emit_main_open
 
 # If requested, emit one or more statements possibly inside main
-[ $e -gt 0 ] && echo '#line 1 "<-e>"' >> "$c"
-for ((i = 0; i < e; ++i)); do
-    printf '%s\n' "${E[$i]}" >> "$c"
-done
+if [ ${#E[@]} -gt 0 ]
+then echo '#line 1 "<-e>"'     >> "$c"
+     printf '%s\n' "${E[@]}" >> "$c"
+fi
 
 # Prepare source from standard input for "interpretation" by the compiler.
 # Possibly swap shebang on first input line with a preprocessor line pragma so
@@ -265,9 +265,7 @@ then emit_main_open
 fi
 
 # Add libraries from command line options
-for ((i = 0; i < l; ++i)); do
-     logic+=("-l${L[$i]}")
-done
+[ ${#L[@]} -gt 0 ] && logic+=("${L[@]/#/-l}")
 
 # Compile the generated source with appropriate verbosity
 [ $v -ge 2 ] && cat "$c" 1>&2
