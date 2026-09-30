@@ -83,7 +83,7 @@ while getopts e:hl:mp:r:st:vx:F:L:RSW flag; do
     R) r=/dev/null                ;; # Equivalent to -r /dev/null
     S) S=1                        ;; # To process later
     W) CFLAGS="${CFLAGS:+${CFLAGS} }-Wall -Werror" ;; # Space-separated append
-    ?) exit;                      ;;
+    ?) exit 2                     ;; # Usage error
   esac
 done
 shift $((OPTIND-1))
